@@ -51,7 +51,6 @@ class AuthenticationService {
                         status: status
                     });
 
-                    console.log("New User", newUser);
                     resolve({ success: true, message: "Create successful", data: { newUser } });
                 } else {
                     reject({ success: false, message: "User already exists" });

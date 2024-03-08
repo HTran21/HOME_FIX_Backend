@@ -1,5 +1,7 @@
 const db = require('../app/models/index')
 const AuthenticationService = require("../services/authenService");
+const multer = require('multer');
+const storage = require("../middleware/upload_image")
 
 const jwt = require("jsonwebtoken");
 
@@ -61,12 +63,33 @@ class AuthenticationController {
     }
     async register(req, res, next) {
         try {
-            const { username, password, email, phone, address, avatar } = req.body;
-            const role = "KH";
-            const status = "Y";
-            console.log("Data", req.body);
-            let data = await AuthenticationService.registerService(username, password, email, phone, address, avatar, role, status);
-            return res.json(data);
+            const upload = multer({ storage: storage }).single("avatar");
+
+            upload(req, res, async function (err) {
+                if (err instanceof multer.MulterError) {
+                    res.send(err);
+                }
+                else if (err) {
+                    res.send(err);
+                }
+                else {
+
+                    const url = req.file.originalname;
+                    const { username, password, email, phone, address, avatar } = req.body;
+
+                    var role = 'KH';
+                    var status = 'Y';
+                    try {
+                        let data = await AuthenticationService.registerService(username, password, email, phone, address, url, role, status);
+
+                        return res.json(data);
+
+                    }
+                    catch (error) {
+                        return res.json(error);
+                    }
+                }
+            })
 
         }
         catch (e) {
