@@ -17,6 +17,10 @@ app.use(
     })
 );
 
+// static public
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "upload")));
+
 // parse application/x-www-form-urlencoded
 // app.use(express.urlencoded({ extended: true }));
 app.use(

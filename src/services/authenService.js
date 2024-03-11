@@ -21,7 +21,7 @@ class AuthenticationService {
                         status: status
                     });
 
-                    console.log("New User", newUser);
+                    // console.log("New User", newUser);
                     resolve({ success: true, message: "Create successful", data: { newUser } });
                 } else {
                     reject({ success: false, message: "User already exists" });
@@ -99,32 +99,69 @@ class AuthenticationService {
         return new Promise(async (resolve, reject) => {
             try {
                 let user = await db.User.findOne({ where: { email: email } });
+                let staff = await db.Staff.findOne({ where: { emailStaff: email } });
 
-                if (!user) {
+                // if (!user) {
 
-                    reject({ success: false, message: "User not found" });
-                }
+                //     reject({ success: false, message: "User not found" });
+                // }
 
-                const isPasswordValid = await bcrypt.compare(password, user.password);
-                if (!isPasswordValid) {
-                    reject({ success: false, message: "Invalid password" });
-                }
-                else {
-                    const infoUser = {
-                        role: user.role,
-                        id: user.id,
-                        username: user.username,
-                        email: user.email,
-                        phone: user.phone,
-                        address: user.address,
-                        avatar: user.avatar
+                if (user) {
+                    const isPasswordValid = await bcrypt.compare(password, user.password);
+                    const role = user.role;
+                    if (!isPasswordValid) {
+                        reject({ success: false, message: "Sai mật khẩu" });
                     }
-                    const access_token = jwt.sign(infoUser, 'access_token'
-                        // , { expiresIn: '30m' }
-                    )
-                    // console.log("access token user", access_token)
-                    resolve({ success: true, message: "Login successful", data: { access_token, infoUser } });
+                    else {
+                        const infoUser = {
+                            role: user.role,
+                            id: user.id,
+                            username: user.username,
+                            email: user.email,
+                            phone: user.phone,
+                            address: user.address,
+                            avatar: user.avatar
+                        }
+                        const access_token = jwt.sign(infoUser, 'access_token'
+                            // , { expiresIn: '30m' }
+                        )
+                        // console.log("access token user", access_token)
+                        resolve({ success: true, message: "Đăng nhập thành công", data: { access_token, infoUser, role } });
+                    }
                 }
+                else if (staff) {
+                    const isPasswordValid = await bcrypt.compare(password, staff.passwordStaff);
+                    const role = staff.role;
+
+                    if (!isPasswordValid) {
+                        reject({ success: false, message: "Sai mật khẩu" });
+                    }
+                    else {
+                        const infoStaff = {
+                            role: staff.role,
+                            id: staff.id,
+                            username: staff.usernameStaff,
+                            position: staff.position,
+                            email: staff.emailStaff,
+                            phone: staff.phoneStaff,
+                            address: staff.addressStaff,
+                            avatar: staff.avatarStaff
+                        }
+                        const access_token = jwt.sign(infoStaff, 'access_token'
+                            // , { expiresIn: '30m' }
+                        )
+                        // console.log("access token user", access_token)
+                        resolve({ success: true, message: "Đăng nhập thành công", data: { access_token, infoStaff, role } });
+                    }
+                }
+
+                else {
+
+                    reject({ success: false, message: "Tài khoản không tồn tại" });
+
+                }
+
+
             } catch (error) {
                 reject(error);
             }
