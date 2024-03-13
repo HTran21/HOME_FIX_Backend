@@ -4,9 +4,9 @@ class AdminService {
     async postService(nameService, contentHTML, contentMarkdown, url) {
         return new Promise(async (resolve, reject) => {
             try {
-                let blog = await db.Blog.findOne({ where: { nameService: nameService } })
-                if (!blog) {
-                    let newBlog = await db.Blog.create({
+                let service = await db.Service.findOne({ where: { nameService: nameService } })
+                if (!service) {
+                    let newService = await db.Service.create({
                         nameService: nameService,
                         contentHTML: contentHTML,
                         contentMarkDown: contentMarkdown,

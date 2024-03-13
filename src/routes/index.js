@@ -1,12 +1,12 @@
 const authentication = require("./authentication");
 const user = require("./user");
 const admin = require("./admin");
-const blog = require("./blog")
+const service = require("./service")
 const authenMiddleware = require("../middleware/authMiddleware");
 
 function route(app) {
     app.use("/", authentication)
-    app.use("/blog", blog)
+    app.use("/service", service)
     app.use("/admin", authenMiddleware, admin)
     app.use("/user", user)
 }

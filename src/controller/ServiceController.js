@@ -1,14 +1,14 @@
 // const { da } = require('date-fns/locale');
 const db = require('../app/models/index');
-const blogService = require("../services/blogService");
+const serviceService = require("../services/serviceService");
 const multer = require('multer');
 const storage = require("../middleware/upload_image")
 
-class BlogController {
+class ServiceController {
 
     async getService(req, res, next) {
         try {
-            let data = await blogService.getBlogService();
+            let data = await serviceService.getBlogService();
             return res.json(data);
         }
         catch (e) {
@@ -25,7 +25,7 @@ class BlogController {
     async getDetailService(req, res, next) {
         try {
             const id = req.params.id;
-            let data = await blogService.getDetailBlogService(id);
+            let data = await serviceService.getDetailBlogService(id);
             return res.json(data);
         }
         catch (e) {
@@ -55,7 +55,7 @@ class BlogController {
                         const id = req.params.id;
                         const { nameService, contentHTML, contentMarkdown } = req.body;
                         try {
-                            let data = await blogService.updateServiceImage(id, nameService, contentHTML, contentMarkdown, url)
+                            let data = await serviceService.updateServiceImage(id, nameService, contentHTML, contentMarkdown, url)
                             return res.json(data);
                         }
                         catch (error) {
@@ -66,7 +66,7 @@ class BlogController {
                         const id = req.params.id;
                         const { nameService, contentHTML, contentMarkdown } = req.body;
                         try {
-                            let data = await blogService.updateService(id, nameService, contentHTML, contentMarkdown)
+                            let data = await serviceService.updateService(id, nameService, contentHTML, contentMarkdown)
                             return res.json(data);
                         }
                         catch (error) {
@@ -90,7 +90,7 @@ class BlogController {
     async deleteBlogService(req, res, next) {
         try {
             const id = req.params.id;
-            let data = await blogService.deleteBlogService(id);
+            let data = await serviceService.deleteBlogService(id);
             return res.json(data);
         }
         catch (e) {
@@ -102,4 +102,4 @@ class BlogController {
     }
 }
 
-module.exports = new BlogController();
+module.exports = new ServiceController();

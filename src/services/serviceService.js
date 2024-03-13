@@ -1,11 +1,11 @@
 const db = require('../app/models/index');
-const { deleteService } = require('../controller/BlogController');
+const { deleteService } = require('../controller/ServiceController');
 
 class BlogService {
     async getBlogService() {
         return new Promise(async (resolve, reject) => {
             try {
-                let listService = await db.Blog.findAll();
+                let listService = await db.Service.findAll();
                 resolve({ listService });
             }
             catch (error) {
@@ -18,7 +18,7 @@ class BlogService {
     async getDetailBlogService(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let detailService = await db.Blog.findOne({ where: { id: id } });
+                let detailService = await db.Service.findOne({ where: { id: id } });
                 resolve({ detailService });
             }
             catch (error) {
@@ -31,7 +31,7 @@ class BlogService {
     async updateServiceImage(id, nameService, contentHTML, contentMarkdown, url) {
         return new Promise(async (resolve, reject) => {
             try {
-                let updateService = await db.Blog.update({
+                let updateService = await db.Service.update({
                     nameService: nameService,
                     contentHTML: contentHTML,
                     contentMarkDown: contentMarkdown,
@@ -53,7 +53,7 @@ class BlogService {
     async updateService(id, nameService, contentHTML, contentMarkdown) {
         return new Promise(async (resolve, reject) => {
             try {
-                let updateDetailService = await db.Blog.update({
+                let updateDetailService = await db.Service.update({
                     nameService: nameService,
                     contentHTML: contentHTML,
                     contentMarkDown: contentMarkdown,
@@ -74,7 +74,7 @@ class BlogService {
     async deleteBlogService(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let deleteDetailService = await db.Blog.destroy({
+                let deleteDetailService = await db.Service.destroy({
                     where: {
                         id: id
                     }
