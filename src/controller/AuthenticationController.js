@@ -9,7 +9,7 @@ class AuthenticationController {
     async test(req, res, next) {
         try {
             let data = await db.Staff.findAll();
-            console.log("Data", data);
+            // console.log("Data", data);
             return res.json(data)
         }
         catch (e) {

@@ -1,6 +1,6 @@
 const db = require('../app/models/index')
 const multer = require('multer');
-const storage = require("../middleware/upload_image")
+const storage = require("../middleware/upload_image");
 const adminService = require('../services/adminService');
 
 class AdminController {
