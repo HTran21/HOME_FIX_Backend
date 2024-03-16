@@ -100,6 +100,24 @@ class ServiceController {
             }
         }
     }
+
+    async createOperation(req, res, next) {
+        try {
+            const nameOperation = req.body.nameOperation;
+            const priceOperation = parseInt(req.body.priceOperation);
+            const idService = parseInt(req.body.idService);
+            let data = await serviceService.createOperationService(nameOperation, priceOperation, idService)
+            return res.json(data);
+
+        }
+        catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+
+        }
+    }
 }
 
 module.exports = new ServiceController();

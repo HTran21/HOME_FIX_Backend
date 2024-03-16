@@ -1,5 +1,4 @@
 const db = require('../app/models/index');
-const { deleteService } = require('../controller/ServiceController');
 
 class BlogService {
     async getBlogService() {
@@ -86,6 +85,28 @@ class BlogService {
             }
         })
     }
+
+    async createOperationService(nameOperation, priceOperation, idService) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let operation = await db.Operation.findOne({ where: { nameOperation: nameOperation } })
+                if (!operation) {
+                    let newOperation = await db.Operation.create({
+                        ID_Service: idService,
+                        nameOperation: nameOperation,
+                        price: priceOperation,
+                    });
+                    resolve({ success: true, message: "Tạo thao tác thành công" });
+                } else {
+                    reject({ success: false, message: "Thao tác đã tồn tại" });
+                }
+            }
+            catch (error) {
+                reject(error)
+            }
+        })
+    }
+
 }
 
 module.exports = new BlogService();
