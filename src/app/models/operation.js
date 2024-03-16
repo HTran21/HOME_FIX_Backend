@@ -14,10 +14,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Service",
         targetKey: "id",
       });
+
+      Operation.belongsTo(models.Categori, {
+        foreignKey: "ID_Categori",
+        targetKey: "id",
+      });
     }
   }
   Operation.init({
     ID_Service: DataTypes.INTEGER,
+    ID_Categori: DataTypes.INTEGER,
     nameOperation: DataTypes.STRING,
     price: DataTypes.INTEGER,
 

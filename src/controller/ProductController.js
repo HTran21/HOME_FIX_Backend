@@ -46,8 +46,14 @@ class ProductController {
                 else {
                     const nameBrand = req.body.nameBrand;
                     const imageBrand = req.file.originalname;
-                    let data = await productService.createBrand(nameBrand, imageBrand);
-                    return res.json(data);
+                    try {
+                        let data = await productService.createBrand(nameBrand, imageBrand);
+                        return res.json(data);
+                    }
+                    catch (error) {
+                        return res.json(error);
+                    }
+
 
                 }
             })
@@ -71,6 +77,65 @@ class ProductController {
             return res.status(400).json({ error: e })
         }
     }
+
+    async getCategories(req, res, next) {
+        try {
+
+            let data = await productService.getCategories();
+            return res.json(data);
+
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e })
+        }
+    }
+
+    async createCategories(req, res, next) {
+        try {
+            const upload = multer({ storage: storage }).single("imageCategories");
+
+            upload(req, res, async function (err) {
+                if (err instanceof multer.MulterError) {
+                    res.send(err);
+                }
+                else if (err) {
+                    res.send(err);
+                }
+                else {
+                    const nameCategories = req.body.nameCategories;
+                    const imageCategories = req.file.originalname;
+                    try {
+                        let data = await productService.createCategories(nameCategories, imageCategories);
+                        return res.json(data);
+                    }
+                    catch (error) {
+                        return res.json(error)
+                    }
+
+                }
+            })
+        }
+        catch (e) {
+            console.log(e)
+            return res.status(400).json({ error: e })
+        }
+    }
+
+    async deleteCategories(req, res, next) {
+        try {
+
+            const id = req.params.id;
+            let data = await productService.deleteCategories(id);
+            return res.json(data);
+
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e })
+        }
+    }
+
 }
 
 module.exports = new ProductController();

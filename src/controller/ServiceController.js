@@ -106,7 +106,8 @@ class ServiceController {
             const nameOperation = req.body.nameOperation;
             const priceOperation = parseInt(req.body.priceOperation);
             const idService = parseInt(req.body.idService);
-            let data = await serviceService.createOperationService(nameOperation, priceOperation, idService)
+            const idCategori = parseInt(req.body.idCategori);
+            let data = await serviceService.createOperationService(nameOperation, priceOperation, idService, idCategori)
             return res.json(data);
 
         }
@@ -118,6 +119,26 @@ class ServiceController {
 
         }
     }
+
+    async getAllServicesWithOperations(req, res, next) {
+        try {
+            // Truy vấn toàn bộ dữ liệu từ bảng Service
+            const services = await db.Service.findAll();
+
+            // Duyệt qua mỗi Service và lấy danh sách các Operation tương ứng
+            const servicesWithOperations = await Promise.all(services.map(async (service) => {
+                const operations = await db.Operation.findAll({ where: { ID_Service: service.id } });
+                return { service, operations };
+            }));
+
+            // Trả về mảng chứa thông tin về tất cả các Service và các Operation tương ứng
+            return res.json(servicesWithOperations);
+        } catch (error) {
+            console.error('Error retrieving services with operations:', error);
+            throw error;
+        }
+    };
+
 }
 
 module.exports = new ServiceController();
