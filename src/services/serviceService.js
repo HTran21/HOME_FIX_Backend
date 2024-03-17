@@ -86,6 +86,8 @@ class BlogService {
         })
     }
 
+
+
     async createOperationService(nameOperation, priceOperation, idService, idCategori) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -104,6 +106,59 @@ class BlogService {
             }
             catch (error) {
                 reject(error)
+            }
+        })
+    }
+
+    async getDetailOperation(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let detailOperation = await db.Operation.findOne({ where: { id: id } })
+                if (detailOperation) {
+                    resolve({ detailOperation });
+                } else {
+                    reject({ success: false, message: "Thao tác không tồn tại" });
+                }
+            }
+            catch {
+                reject({ success: false, message: "Thao tác không tồn tại" });
+            }
+        })
+    }
+
+
+    async updateOperation(id, nameOperation, priceOperation) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let updateOperation = await db.Operation.update({
+                    nameOperation: nameOperation,
+                    price: priceOperation,
+                }, {
+                    where: {
+                        id: id
+                    }
+                })
+                resolve({ success: true, message: "Cập nhật dịch vụ thành công" });
+            }
+            catch (error) {
+                reject(error);
+            }
+
+        })
+    }
+
+    async deleteOperation(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let deleteDetailOperation = await db.Operation.destroy({
+                    where: {
+                        id: id
+                    }
+                })
+                resolve({ success: true, message: "Đã xóa thao tác" });
+            }
+            catch (error) {
+                reject(error);
             }
         })
     }

@@ -107,9 +107,13 @@ class ServiceController {
             const priceOperation = parseInt(req.body.priceOperation);
             const idService = parseInt(req.body.idService);
             const idCategori = parseInt(req.body.idCategori);
-            let data = await serviceService.createOperationService(nameOperation, priceOperation, idService, idCategori)
-            return res.json(data);
-
+            try {
+                let data = await serviceService.createOperationService(nameOperation, priceOperation, idService, idCategori)
+                return res.json(data);
+            }
+            catch (error) {
+                return res.json(error)
+            }
         }
         catch (e) {
             console.error(e);
@@ -117,6 +121,18 @@ class ServiceController {
                 return res.status(400).json({ error: e });
             }
 
+        }
+    }
+
+    async getDetailOperation(req, res, next) {
+        try {
+            const id = req.params.id;
+            let data = await serviceService.getDetailOperation(id);
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            return res.json({ error: e })
         }
     }
 
@@ -138,6 +154,31 @@ class ServiceController {
             throw error;
         }
     };
+
+    async updateOperation(req, res, next) {
+        try {
+            const { nameOperation, priceOperation } = req.body;
+            const id = req.params.id;
+            let data = await serviceService.updateOperation(id, nameOperation, priceOperation);
+            return res.json(data);
+        }
+        catch (error) {
+            console.log(error);
+            return res.json({ error })
+        }
+    }
+
+    async deleteOperation(req, res, next) {
+        try {
+            const id = req.params.id;
+            let data = await serviceService.deleteOperation(id);
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            return res.json({ error });
+        }
+    }
 
 }
 
