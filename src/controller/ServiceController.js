@@ -90,8 +90,13 @@ class ServiceController {
     async deleteBlogService(req, res, next) {
         try {
             const id = req.params.id;
-            let data = await serviceService.deleteBlogService(id);
-            return res.json(data);
+            try {
+                let data = await serviceService.deleteBlogService(id);
+                return res.json(data);
+            }
+            catch (error) {
+                return res.json(error)
+            }
         }
         catch (e) {
             console.error(e);

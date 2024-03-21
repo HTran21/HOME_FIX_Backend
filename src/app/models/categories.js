@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "id",
         foreignKey: "ID_Categori",
       });
+
+      Categori.hasMany(models.Product, {
+        sourceKey: "id",
+        foreignKey: "ID_Categori",
+      });
     }
   }
   Categori.init({

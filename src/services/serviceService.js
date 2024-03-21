@@ -73,12 +73,20 @@ class BlogService {
     async deleteBlogService(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let deleteDetailService = await db.Service.destroy({
-                    where: {
-                        id: id
-                    }
-                })
-                resolve({ success: true, message: "Đã xóa dịch vụ" });
+
+                const operationExists = await db.Operation.findOne({ where: { ID_Service: id } });
+                if (!operationExists) {
+                    let deleteDetailService = await db.Service.destroy({
+                        where: {
+                            id: id
+                        }
+                    })
+                    resolve({ success: true, message: "Đã xóa dịch vụ" });
+                }
+                else {
+                    resolve({ success: false, message: "Không thể xóa dịch vụ" });
+                }
+
             }
             catch (error) {
                 reject(error);

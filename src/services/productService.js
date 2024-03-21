@@ -1,6 +1,88 @@
 const db = require('../app/models/index');
+const { Op } = require('sequelize');
 
 class ProductService {
+
+    async getProduct(ID_Categori, ID_Brand) {
+        return new Promise(async (resolve, reject) => {
+            // console.log("Categori", ID_Categori);
+            // console.log("Brand", ID_Brand);
+            const whereCondition = {};
+
+            if (ID_Categori) {
+                whereCondition.ID_Categori = ID_Categori
+            }
+
+            if (ID_Brand) {
+                whereCondition.ID_Brand = ID_Brand
+            }
+
+            const listProduct = await db.Product.findAndCountAll({ where: whereCondition })
+
+            resolve(listProduct);
+        })
+    }
+
+    async getDetailProduct(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let product = await db.Product.findOne({ where: { id: id } });
+                resolve(product);
+            }
+            catch (error) {
+                reject(error)
+            }
+        })
+    }
+
+    async searchProduct(search) {
+        return new Promise(async (resolve, reject) => {
+
+            const listProduct = await db.Product.findAll({
+                where: {
+                    nameProduct: {
+                        [Op.like]: `%${search}%`
+                    }
+                }
+            })
+
+            resolve(listProduct);
+        })
+    }
+
+    async createProduct(idBrand, idCategori, nameProduct, imageProduct, contentMarkdown, contentHTML) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                // console.log("idBrand", idBrand);
+                // console.log("idCategori", idCategori);
+                // console.log("nameProduct", nameProduct);
+                // console.log("imageProduct", imageProduct);
+                // console.log("contentMarkdown", contentMarkdown);
+                // console.log("contentHTML", contentHTML);
+
+                let product = await db.Product.findOne({ where: { nameProduct: nameProduct } })
+                if (!product) {
+                    let newProduct = await db.Product.create({
+                        ID_Brand: idBrand,
+                        ID_Categori: idCategori,
+                        nameProduct: nameProduct,
+                        imageProduct: imageProduct,
+                        contentMarkdown: contentMarkdown,
+                        contentHTML: contentHTML
+
+                    })
+                    resolve({ success: true, message: "Tạo sản phẩm thành công" });
+                }
+                else {
+                    reject({ success: false, message: "Thương hiệu đã tồn tại" });
+                }
+
+            }
+            catch (error) {
+                reject(error)
+            }
+        })
+    }
 
     async getBrand() {
         return new Promise(async (resolve, reject) => {
