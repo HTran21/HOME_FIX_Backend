@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Service",
       });
 
+      Service.hasMany(models.Categori, {
+        sourceKey: "id",
+        foreignKey: "ID_Service",
+      });
+
     }
   }
   Service.init({

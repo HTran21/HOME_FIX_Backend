@@ -9,6 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      ID_Service: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       nameCategories: {
         type: Sequelize.STRING
       },

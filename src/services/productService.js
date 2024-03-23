@@ -137,8 +137,17 @@ class ProductService {
         return new Promise(async (resolve, reject) => {
             try {
                 let listCategories = await db.Categori.findAll();
-                // console.log(listCategories)
-                resolve(listCategories);
+                // // console.log(listCategories)
+                // resolve(listCategories);
+                let categoriCounts = [];
+                for (let category of listCategories) {
+                    // Đếm số lượng sản phẩm từ bảng "Product" dựa trên "idCategory"
+                    let count = await db.Product.count({ where: { ID_Categori: category.id } });
+
+                    // Tạo đối tượng chứa idCategory và số lượng sản phẩm, sau đó đưa vào mảng kết quả
+                    categoriCounts.push({ category: category, count: count });
+                }
+                resolve(categoriCounts);
             }
             catch (error) {
                 reject(error)
@@ -146,12 +155,13 @@ class ProductService {
         })
     }
 
-    async createCategories(nameCategories, imageCategories) {
+    async createCategories(idService, nameCategories, imageCategories) {
         return new Promise(async (resolve, reject) => {
             try {
                 let category = await db.Categori.findOne({ where: { nameCategories: nameCategories } })
                 if (!category) {
                     let newCategories = await db.Categori.create({
+                        ID_Service: idService,
                         nameCategories: nameCategories,
                         imageCategories: imageCategories
                     })

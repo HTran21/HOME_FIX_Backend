@@ -20,9 +20,15 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "id",
         foreignKey: "ID_Categori",
       });
+
+      Categori.belongsTo(models.Service, {
+        foreignKey: "ID_Service",
+        targetKey: "id",
+      });
     }
   }
   Categori.init({
+    ID_Service: DataTypes.INTEGER,
     nameCategories: DataTypes.STRING,
     imageCategories: DataTypes.STRING,
   }, {

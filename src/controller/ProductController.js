@@ -259,8 +259,9 @@ class ProductController {
                 else {
                     const nameCategories = req.body.nameCategories;
                     const imageCategories = req.file.originalname;
+                    const idService = req.body.idService;
                     try {
-                        let data = await productService.createCategories(nameCategories, imageCategories);
+                        let data = await productService.createCategories(idService, nameCategories, imageCategories);
                         return res.json(data);
                     }
                     catch (error) {
