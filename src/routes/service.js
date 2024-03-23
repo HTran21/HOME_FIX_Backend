@@ -7,8 +7,8 @@ router.get("/getAllOperation", serviceController.getAllServicesWithOperations);
 router.post("/createOperation", serviceController.createOperation);
 router.post("/updateOperation/:id", serviceController.updateOperation);
 router.get("/getOperation/:id", serviceController.getDetailOperation);
-router.get("/getService/:id", serviceController.getDetailService);
-router.put("/updateService/:id", serviceController.updateService);
+router.get("/detail/:id", serviceController.getDetailService);
+router.put("/update/:id", serviceController.updateService);
 router.delete("/deletService/:id", serviceController.deleteBlogService);
 router.delete("/deleteOperation/:id", serviceController.deleteOperation);
 
