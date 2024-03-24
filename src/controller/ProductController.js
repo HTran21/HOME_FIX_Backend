@@ -234,7 +234,7 @@ class ProductController {
 
     async getCategories(req, res, next) {
         try {
-
+            const id = req.params.id;
             let data = await productService.getCategories();
             return res.json(data);
 
@@ -244,6 +244,21 @@ class ProductController {
             return res.status(400).json({ error: e })
         }
     }
+
+    async getCategoriesService(req, res, next) {
+        try {
+            const id = req.params.id;
+            console.log("ID", id)
+            let data = await productService.getCategoriesService(id);
+            return res.json(data);
+
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e })
+        }
+    }
+
 
     async createCategories(req, res, next) {
         try {

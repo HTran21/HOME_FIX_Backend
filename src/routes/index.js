@@ -3,7 +3,8 @@ const user = require("./user");
 const admin = require("./admin");
 const service = require("./service");
 const operation = require("./operation");
-const product = require("./product")
+const product = require("./product");
+const specialization = require("./specialization")
 const authenMiddleware = require("../middleware/authMiddleware");
 
 function route(app) {
@@ -11,8 +12,9 @@ function route(app) {
     app.use("/service", service)
     app.use("/admin", authenMiddleware, admin)
     app.use("/user", user)
-    app.use("/operation", user)
+    app.use("/operation", operation)
     app.use("/product", product)
+    app.use("/specialization", specialization)
 }
 
 module.exports = route;

@@ -12,5 +12,7 @@ router.delete("/brand/:id", productController.deleteBrand);
 router.delete("/categories/:id", productController.deleteCategories);
 router.get("/detail/:id", productController.getDetailProduct);
 router.put("/detail/:id", productController.updateProduct);
+router.get("/categories/:id", productController.getCategoriesService);
+
 
 module.exports = router;

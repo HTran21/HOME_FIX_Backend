@@ -137,17 +137,31 @@ class ProductService {
         return new Promise(async (resolve, reject) => {
             try {
                 let listCategories = await db.Categori.findAll();
-                // // console.log(listCategories)
-                // resolve(listCategories);
-                let categoriCounts = [];
-                for (let category of listCategories) {
-                    // Đếm số lượng sản phẩm từ bảng "Product" dựa trên "idCategory"
-                    let count = await db.Product.count({ where: { ID_Categori: category.id } });
+                // console.log(listCategories)
+                resolve(listCategories);
+                // let categoriCounts = [];
+                // for (let category of listCategories) {
+                //     // Đếm số lượng sản phẩm từ bảng "Product" dựa trên "idCategory"
+                //     let count = await db.Product.count({ where: { ID_Categori: category.id } });
 
-                    // Tạo đối tượng chứa idCategory và số lượng sản phẩm, sau đó đưa vào mảng kết quả
-                    categoriCounts.push({ category: category, count: count });
-                }
-                resolve(categoriCounts);
+                //     // Tạo đối tượng chứa idCategory và số lượng sản phẩm, sau đó đưa vào mảng kết quả
+                //     categoriCounts.push({ category: category, count: count });
+                // }
+                // resolve(categoriCounts);
+            }
+            catch (error) {
+                reject(error)
+            }
+        })
+    }
+
+    async getCategoriesService(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let listCategories = await db.Categori.findAll({ where: { ID_Service: id } });
+                // // console.log(listCategories)
+                resolve(listCategories);
+
             }
             catch (error) {
                 reject(error)
