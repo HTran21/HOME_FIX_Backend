@@ -120,6 +120,7 @@ class ProductService {
     async deleteBrand(id) {
         return new Promise(async (resolve, reject) => {
             try {
+                // Kiểm tra có sản phẩm
                 let deleteBrand = await db.Brand.destroy({
                     where: {
                         id: id

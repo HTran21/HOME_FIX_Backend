@@ -10,15 +10,10 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // Operation.belongsTo(models.Service, {
-      //   foreignKey: "ID_Service",
-      //   targetKey: "id",
-      // });
-
-      // Operation.belongsTo(models.Categori, {
-      //   foreignKey: "ID_Categori",
-      //   targetKey: "id",
-      // });
+      Specialization.hasMany(models.Repairer, {
+        sourceKey: "id",
+        foreignKey: "ID_Speliciazation",
+      });
     }
   }
   Specialization.init({

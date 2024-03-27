@@ -4,7 +4,8 @@ const admin = require("./admin");
 const service = require("./service");
 const operation = require("./operation");
 const product = require("./product");
-const specialization = require("./specialization")
+const specialization = require("./specialization");
+const repairer = require("./repairer")
 const authenMiddleware = require("../middleware/authMiddleware");
 
 function route(app) {
@@ -15,6 +16,7 @@ function route(app) {
     app.use("/operation", operation)
     app.use("/product", product)
     app.use("/specialization", specialization)
+    app.use("/repair", repairer)
 }
 
 module.exports = route;
