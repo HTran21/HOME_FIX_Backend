@@ -248,7 +248,7 @@ class ProductController {
     async getCategoriesService(req, res, next) {
         try {
             const id = req.params.id;
-            console.log("ID", id)
+            // console.log("ID", id)
             let data = await productService.getCategoriesService(id);
             return res.json(data);
 

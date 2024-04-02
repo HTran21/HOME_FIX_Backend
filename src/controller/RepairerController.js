@@ -6,6 +6,27 @@ const storage = require("../middleware/upload_image");
 // const serviceService = require("../services/serviceService");
 
 class RepairerController {
+
+    async detailProfile(req, res, next) {
+        try {
+            const id = req.params.id;
+            let data = await repairerService.detailProfile(id);
+            try {
+                return res.json(data)
+            }
+            catch (e) {
+                console.log(e)
+                return res.json(e)
+            }
+        }
+        catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+        }
+    }
+
     async updateRepairer(req, res, next) {
         try {
             const upload = multer({ storage: storage }).single('avatar');
@@ -72,9 +93,6 @@ class RepairerController {
             if (e) {
                 return res.status(400).json({ error: e });
             }
-
-
-
         }
     }
 

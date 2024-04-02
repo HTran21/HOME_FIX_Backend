@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Speliciazation",
         targetKey: "id",
       });
+
+      Repairer.hasMany(models.Schedule, {
+        sourceKey: "id",
+        foreignKey: "ID_Repairer",
+      });
     }
   }
   Repairer.init({

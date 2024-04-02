@@ -75,7 +75,8 @@ class AuthenticationController {
                 else {
 
                     const url = req.file.originalname;
-                    const { username, password, email, phone, address, avatar } = req.body;
+                    // Da xoa bien avatar
+                    const { username, password, email, phone, address } = req.body;
 
                     var role = 'KH';
                     var status = 'Y';

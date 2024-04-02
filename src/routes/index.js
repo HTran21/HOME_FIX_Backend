@@ -5,7 +5,8 @@ const service = require("./service");
 const operation = require("./operation");
 const product = require("./product");
 const specialization = require("./specialization");
-const repairer = require("./repairer")
+const repairer = require("./repairer");
+const schedule = require("./schedule")
 const authenMiddleware = require("../middleware/authMiddleware");
 
 function route(app) {
@@ -17,6 +18,7 @@ function route(app) {
     app.use("/product", product)
     app.use("/specialization", specialization)
     app.use("/repair", repairer)
+    app.use("/schedule", schedule)
 }
 
 module.exports = route;

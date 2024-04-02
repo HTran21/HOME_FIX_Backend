@@ -100,6 +100,7 @@ class AuthenticationService {
             try {
                 let user = await db.User.findOne({ where: { email: email } });
                 let staff = await db.Staff.findOne({ where: { emailStaff: email } });
+                let repairer = await db.Repairer.findOne({ where: { emailRepairer: email } });
 
                 // if (!user) {
 
@@ -143,6 +144,7 @@ class AuthenticationService {
                             username: staff.usernameStaff,
                             position: staff.position,
                             email: staff.emailStaff,
+                            position: staff.position,
                             phone: staff.phoneStaff,
                             address: staff.addressStaff,
                             avatar: staff.avatarStaff
@@ -155,6 +157,33 @@ class AuthenticationService {
                     }
                 }
 
+                else if (repairer) {
+                    const isPasswordValid = await bcrypt.compare(password, repairer.passwordRepairer);
+                    const role = repairer.role;
+
+                    if (!isPasswordValid) {
+                        reject({ success: false, message: "Sai mật khẩu" });
+                    }
+                    else {
+                        const infoRepairer = {
+                            role: repairer.role,
+                            id: repairer.id,
+                            username: repairer.usernameRepairer,
+                            position: repairer.position,
+                            email: repairer.emailRepairer,
+                            phone: repairer.phoneRepaierer,
+                            position: repairer.position,
+                            address: repairer.addressRepaierer,
+                            avatar: repairer.avatarRepairer
+                        }
+                        const access_token = jwt.sign(infoRepairer, 'access_token'
+                            // , { expiresIn: '30m' }
+                        )
+                        // console.log("access token user", access_token)
+                        resolve({ success: true, message: "Đăng nhập thành công", data: { access_token, infoRepairer, role } });
+                    }
+                }
+
                 else {
 
                     reject({ success: false, message: "Tài khoản không tồn tại" });
@@ -163,6 +192,7 @@ class AuthenticationService {
 
 
             } catch (error) {
+                console.log(error)
                 reject(error);
             }
         })

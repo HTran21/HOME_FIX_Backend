@@ -33,6 +33,27 @@ class RepairerService {
         })
     }
 
+    async detailProfile(id) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let user = await db.Repairer.findOne({
+                    where: { id: id },
+                    attributes: { exclude: ['passwordRepairer'] }
+                });
+                if (user) {
+                    resolve({ success: true, message: "Tìm thấy tài khoản", data: { user } });
+                }
+
+                else {
+                    reject({ success: false, message: "Không tìm thấy tài khoản" });
+                }
+            }
+            catch (error) {
+                reject(error);
+            }
+        })
+    }
+
     async updateREpairer(username, password, position, email, avatar, phone, address, specialize) {
         return new Promise(async (resolve, reject) => {
             try {
