@@ -31,9 +31,8 @@ class AdminService {
                 let repairer = await db.Repairer.findOne({ where: { emailRepairer: email } });
                 if (!repairer) {
                     const hashedPassword = await bcrypt.hash(password, 10);
-
                     let newRepairer = await db.Repairer.create({
-                        ID_Speliciazation: specialize,
+                        ID_Service: specialize,
                         usernameRepairer: username,
                         passwordRepairer: hashedPassword,
                         position: position,
@@ -46,6 +45,7 @@ class AdminService {
                     });
 
                     resolve({ success: true, message: "Tạo tài khoản thành công", data: { newRepairer } });
+
                 } else {
                     reject({ success: false, message: "Tài khoản đã tồn tại" });
                 }

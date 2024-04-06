@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      ID_Speliciazation: {
+      ID_Service: {
         allowNull: false,
         type: Sequelize.INTEGER
       },

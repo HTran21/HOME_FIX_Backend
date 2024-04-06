@@ -75,7 +75,7 @@ class AdminController {
                         ['addressRepairer', 'address'],
                         ['avatarRepairer', 'avatar'],
                         ['role', 'role'],
-                        ['ID_Speliciazation', 'skill']
+                        ['ID_Service', 'skill']
                     ]
                 });
 

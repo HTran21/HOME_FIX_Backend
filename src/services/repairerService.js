@@ -38,6 +38,12 @@ class RepairerService {
             try {
                 let user = await db.Repairer.findOne({
                     where: { id: id },
+                    include: [
+                        {
+                            model: db.Service,
+                            attributes: ['nameService']
+                        }
+                    ],
                     attributes: { exclude: ['passwordRepairer'] }
                 });
                 if (user) {

@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Service",
       });
 
+      Service.hasMany(models.Repairer, {
+        sourceKey: "id",
+        foreignKey: "ID_Service",
+      });
+
     }
   }
   Service.init({

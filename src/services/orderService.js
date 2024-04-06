@@ -1,6 +1,6 @@
 const db = require('../app/models/index');
 const { Op } = require('sequelize');
-const { deleteOrder } = require('../controller/OrderController');
+// const { deleteOrder } = require('../controller/OrderController');
 
 class OrderService {
 

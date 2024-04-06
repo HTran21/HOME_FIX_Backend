@@ -11,8 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Repairer.belongsTo(models.Specialization, {
-        foreignKey: "ID_Speliciazation",
+      Repairer.belongsTo(models.Service, {
+        foreignKey: "ID_Service",
         targetKey: "id",
       });
 
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Repairer.init({
-    ID_Speliciazation: DataTypes.INTEGER,
+    ID_Service: DataTypes.INTEGER,
     usernameRepairer: DataTypes.STRING,
     passwordRepairer: DataTypes.STRING,
     position: DataTypes.STRING,
