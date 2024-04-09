@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Product",
         targetKey: "id",
       });
+      Order.hasOne(models.DetailOrder, {
+        sourceKey: "id",
+        foreignKey: "ID_Order",
+      });
     }
   }
   Order.init({
@@ -34,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
     desProblem: DataTypes.STRING,
-    desireDate: DataTypes.STRING,
+    desireDate: DataTypes.DATE,
     status: DataTypes.STRING,
 
   }, {

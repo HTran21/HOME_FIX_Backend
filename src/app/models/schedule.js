@@ -14,16 +14,20 @@ module.exports = (sequelize, DataTypes) => {
       //   sourceKey: "id",
       //   foreignKey: "ID_Schedule",
       // });
-      // Schedule.belongsTo(models.Repairer, {
-      //   foreignKey: "ID_Repairer",
-      //   targetKey: "id",
-      // });
+      Schedule.belongsTo(models.Repairer, {
+        foreignKey: "ID_Repairer",
+        targetKey: "id",
+      });
+
+      Schedule.hasMany(models.DetailOrder, {
+        sourceKey: "id",
+        foreignKey: "ID_Schedule",
+      });
     }
   }
   Schedule.init({
     ID_Repairer: DataTypes.INTEGER,
-    startDate: DataTypes.DATE,
-    endDate: DataTypes.DATE,
+    workDay: DataTypes.DATE,
     status: DataTypes.STRING,
   }, {
     sequelize,
