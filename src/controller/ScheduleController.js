@@ -81,6 +81,19 @@ class ScheduleController {
         }
     }
 
+    async getWorkRepairer(req, res, next) {
+        try {
+            const id = req.params.id;
+            const currentDate = req.query.currentDate;
+            let data = await scheduleService.getWorkRepairerService(id, currentDate);
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            return res.json(e)
+        }
+    }
+
 
 }
 

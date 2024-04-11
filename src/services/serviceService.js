@@ -96,16 +96,16 @@ class BlogService {
 
 
 
-    async createOperationService(nameOperation, priceOperation, idService, idCategori) {
+    async createOperationService(nameOperation, priceOperation, idCategori) {
         return new Promise(async (resolve, reject) => {
             try {
-                let operation = await db.Operation.findOne({ where: { nameOperation: nameOperation } })
+                let operation = await db.Operation.findOne({ where: { nameOperation: nameOperation, ID_Categori: idCategori } })
                 if (!operation) {
                     let newOperation = await db.Operation.create({
-                        ID_Service: idService,
+                        ID_Categori: idCategori,
                         nameOperation: nameOperation,
                         price: priceOperation,
-                        ID_Categori: idCategori
+
                     });
                     resolve({ success: true, message: "Tạo thao tác thành công" });
                 } else {
@@ -146,7 +146,7 @@ class BlogService {
                         id: id
                     }
                 })
-                resolve({ success: true, message: "Cập nhật dịch vụ thành công" });
+                resolve({ success: true, message: "Cập nhật thao tác thành công" });
             }
             catch (error) {
                 reject(error);

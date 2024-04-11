@@ -218,6 +218,31 @@ class ProductController {
         }
     }
 
+    async updateBrand(req, res, next) {
+        try {
+            const upload = multer({ storage: storage }).single("imageBrand");
+            upload(req, res, async function (err) {
+                if (err instanceof multer.MulterError) {
+                    res.send(err);
+                }
+                else if (err) {
+                    res.send(err);
+                }
+                else {
+                    const id = req.params.id;
+                    const imageBrand = req.file;
+                    const nameBrand = req.body.nameBrand;
+                    let data = await productService.updateBrandService(id, nameBrand, imageBrand)
+                    return res.json(data);
+                }
+            })
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e })
+        }
+    }
+
     async deleteBrand(req, res, next) {
         try {
 
@@ -299,6 +324,31 @@ class ProductController {
             let data = await productService.deleteCategories(id);
             return res.json(data);
 
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e })
+        }
+    }
+
+    async updateCategoriesService(req, res, next) {
+        try {
+            const upload = multer({ storage: storage }).single("imageCategories");
+            upload(req, res, async function (err) {
+                if (err instanceof multer.MulterError) {
+                    res.send(err);
+                }
+                else if (err) {
+                    res.send(err);
+                }
+                else {
+                    const id = req.params.id;
+                    const imageCategories = req.file;
+                    const { nameCategories, idService } = req.body;
+                    let data = await productService.updateCategoriesService(id, idService, nameCategories, imageCategories)
+                    return res.json(data);
+                }
+            })
         }
         catch (e) {
             console.log(e);

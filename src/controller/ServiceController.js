@@ -2,7 +2,8 @@
 const db = require('../app/models/index');
 const serviceService = require("../services/serviceService");
 const multer = require('multer');
-const storage = require("../middleware/upload_image")
+const storage = require("../middleware/upload_image");
+const { where } = require('sequelize');
 
 class ServiceController {
 
@@ -110,10 +111,10 @@ class ServiceController {
         try {
             const nameOperation = req.body.nameOperation;
             const priceOperation = parseInt(req.body.priceOperation);
-            const idService = parseInt(req.body.idService);
+            // const idService = parseInt(req.body.idService);
             const idCategori = parseInt(req.body.idCategori);
             try {
-                let data = await serviceService.createOperationService(nameOperation, priceOperation, idService, idCategori)
+                let data = await serviceService.createOperationService(nameOperation, priceOperation, idCategori)
                 return res.json(data);
             }
             catch (error) {
@@ -141,19 +142,58 @@ class ServiceController {
         }
     }
 
+    async getOperation(req, res, next) {
+        try {
+            let data = await db.Operation.findAll({
+                include: [{
+                    model: db.Categori
+                }]
+            })
+            return res.json(data);
+        } catch (e) {
+            console.log(e);
+            return res.json({ error: e })
+        }
+    }
+
     async getAllServicesWithOperations(req, res, next) {
         try {
             // Truy vấn toàn bộ dữ liệu từ bảng Service
-            const services = await db.Service.findAll();
+            // const services = await db.Service.findAll();
 
-            // Duyệt qua mỗi Service và lấy danh sách các Operation tương ứng
-            const servicesWithOperations = await Promise.all(services.map(async (service) => {
-                const operations = await db.Operation.findAll({ where: { ID_Service: service.id } });
-                return { service, operations };
-            }));
+            // // Duyệt qua mỗi Service và lấy danh sách các Operation tương ứng
+            // const servicesWithOperations = await Promise.all(services.map(async (service) => {
+            //     const operations = await db.Operation.findAll({ where: { ID_Service: service.id } });
+            //     return { service, operations };
+            // }));
 
-            // Trả về mảng chứa thông tin về tất cả các Service và các Operation tương ứng
-            return res.json(servicesWithOperations);
+            // // Trả về mảng chứa thông tin về tất cả các Service và các Operation tương ứng
+            // return res.json(servicesWithOperations);
+            const ID_Categori = req.query.ID_Categori;
+            const operations = await db.Service.findAll({
+                include: [{
+                    model: db.Categori,
+                    include: [{
+                        model: db.Operation,
+
+                    }]
+                }]
+            });
+            if (ID_Categori) {
+                const operations = await db.Operation.findAll({
+                    where: {
+                        ID_Categori: ID_Categori
+                    },
+                    include: [{
+                        model: db.Categori,
+                        attributes: ['nameCategories']
+                    }]
+                })
+                return res.json(operations);
+            } else {
+                return res.json(operations);
+            }
+
         } catch (error) {
             console.error('Error retrieving services with operations:', error);
             throw error;

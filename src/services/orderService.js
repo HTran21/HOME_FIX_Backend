@@ -465,6 +465,170 @@ class OrderService {
         })
     }
 
+    async fullDetailOrderService(ID_OrderDetail) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let data = await db.DetailOrder.findOne({
+                    where: {
+                        id: ID_OrderDetail
+                    },
+                    include: [{
+                        model: db.Order,
+                        include: [{
+                            model: db.Categori,
+                            attributes: ['nameCategories'],
+                            include: [{
+                                model: db.Service,
+                                attributes: ['nameService']
+                            }]
+                        }]
+
+                    },
+                    {
+                        model: db.Schedule,
+                        include: [{
+                            model: db.Repairer,
+                            attributes: ['usernameRepairer']
+                        }]
+                    }]
+                })
+                if (data.Order.ID_Product) {
+                    let data = await db.DetailOrder.findOne({
+                        where: {
+                            ID_Order: ID_Order
+                        },
+                        include: [{
+                            model: db.Order,
+                            include: [
+                                {
+                                    model: db.Product,
+                                    attributes: ['ID_Brand', 'nameProduct'],
+                                    include: [{
+                                        model: db.Brand,
+                                        attributes: ['nameBrand']
+                                    }]
+                                },
+                                {
+                                    model: db.Categori,
+                                    attributes: ['nameCategories'],
+                                    include: [{
+                                        model: db.Service,
+                                        attributes: ['nameService']
+                                    }]
+                                }]
+
+                        }, {
+                            model: db.Schedule,
+                            include: [{
+                                model: db.Repairer,
+                                attributes: ['usernameRepairer']
+                            }]
+                        }]
+                    })
+                    resolve(data)
+                }
+                else {
+                    resolve(data)
+                }
+
+                // let data = await db.Order.findOne({
+                //     where: { id: ID_Order },
+                //     include: [
+                //         {
+                //             model: db.Categori,
+                //             attributes: ['ID_Service', 'nameCategories'],
+                //             include: [
+                //                 {
+                //                     model: db.Service,
+                //                     attributes: ['nameService']
+                //                 }
+                //             ]
+                //         }, {
+                //             model: db.OrderDetail,
+
+                //         }
+                //     ]
+                // });
+                // if (data.ID_Product) {
+                //     let data = await db.Order.findOne({
+                //         where: { id: ID_Order },
+                //         include: [
+                //             {
+                //                 model: db.Product,
+                //                 attributes: ['ID_Brand', 'nameProduct'],
+                //                 include: [{
+                //                     model: db.Brand,
+                //                     attributes: ['nameBrand']
+                //                 }]
+                //             },
+                //             {
+                //                 model: db.Categori,
+                //                 attributes: ['ID_Service', 'nameCategories'],
+                //                 include: [{
+                //                     model: db.Service,
+                //                     attributes: ['nameService']
+                //                 }]
+                //             },
+                //         ]
+                //     })
+                //     // console.log("Co ID product", order)
+                //     resolve({ data })
+                // } else {
+                //     resolve({ data });
+                //     // console.log("Khong co id product", detailOrder)
+
+                // }
+            }
+            catch (error) {
+                console.log("Lỗi", error);
+                reject(error)
+            }
+
+        })
+    }
+
+    async listTaskOrderService(ID_OrderDetail, totalAmount, listTask) {
+        return new Promise(async (reslove, reject) => {
+            try {
+                console.log("ID_Order", ID_OrderDetail);
+                console.log("Total Amount", totalAmount);
+                console.log("listTask", listTask)
+                const listTaskandCount = listTask.forEach(task => {
+
+                });
+            }
+            catch (error) {
+                console.log("Lỗi", error);
+                reject(error)
+            }
+
+        })
+    }
+
+    async updateStatusOrderService(ID_Order, status) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existOrder = await db.Order.findOne({ where: { id: ID_Order } });
+                if (existOrder) {
+                    let order = await db.Order.update({
+                        status: status
+                    }, {
+                        where: {
+                            id: ID_Order
+                        }
+                    })
+                    resolve({ success: true, message: "Cập nhật trạng thái thành công" })
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" });
+                }
+
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
+    }
 
 
 

@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ID_Schedule",
         targetKey: "id",
       });
+      DetailOrder.hasMany(models.TaskRepair, {
+        sourceKey: "id",
+        foreignKey: "ID_DetailOrder",
+      });
     }
 
   }
@@ -25,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
     ID_Order: DataTypes.INTEGER,
     ID_Schedule: DataTypes.INTEGER,
     timeRepair: DataTypes.STRING,
+    totalAmount: DataTypes.INTEGER,
+    paymentMethod: DataTypes.STRING,
+    paymentStatus: DataTypes.STRING,
 
   }, {
     sequelize,

@@ -121,6 +121,48 @@ class OrderController {
         }
     }
 
+    async fullDetailOrder(req, res, next) {
+        try {
+            const ID_Order = req.params.id;
+            let data = await orderService.fullDetailOrderService(ID_Order);
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e)
+
+            if (e) {
+                return res.json(e);
+            }
+        }
+    }
+
+    async listTaskOrder(req, res, next) {
+        try {
+            const ID_OrderDetail = req.params.id;
+            const { totalAmount, listTask } = req.body;
+            let data = await orderService.listTaskOrderService(ID_OrderDetail, totalAmount, listTask)
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
+        }
+    }
+
+    async updateStatusOrder(req, res, next) {
+        try {
+            const ID_Order = req.params.id;
+            const status = req.body.status;
+            let data = await orderService.updateStatusOrderService(ID_Order, status)
+            return res.json(data);
+        }
+        catch (e) {
+
+        }
+    }
+
+
 
 }
 

@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const db = require('../app/models/index');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 class ScheduleService {
     // async createSchedule(date) {
     //     return new Promise(async (resolve, reject) => {
@@ -116,7 +116,13 @@ class ScheduleService {
             try {
                 let listWork = await db.Schedule.findAll({
                     where: { ID_Repairer: id },
-                    attributes: ['workDay']
+                    attributes: ['workDay'],
+                    include: [
+                        {
+                            model: db.DetailOrder,
+
+                        }
+                    ]
                 });
                 resolve(listWork)
             }
@@ -173,6 +179,40 @@ class ScheduleService {
 
         })
     }
+
+    async getWorkRepairerService(id, currentDate) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const formattedCurrentDate = new Date(currentDate).toISOString();
+                let listWork = await db.Schedule.findAll({
+                    where: {
+                        ID_Repairer: id,
+                        workDay: {
+                            [Op.eq]: formattedCurrentDate
+                        }
+                    },
+                    // attributes: ['workDay'],
+                    include: {
+                        model: db.DetailOrder,
+                        include: {
+                            model: db.Order,
+                            include: {
+                                model: db.Categori,
+                                attributes: ['nameCategories']
+                            }
+                        }
+
+                    }
+                })
+                resolve(listWork)
+            }
+            catch (error) {
+                reject(error);
+            }
+
+        })
+    }
+
 
 
 

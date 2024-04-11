@@ -1,5 +1,5 @@
 const db = require('../app/models/index');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 class ProductService {
 
@@ -117,16 +117,52 @@ class ProductService {
         })
     }
 
+    async updateBrandService(id, nameBrand, imageBrand) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existCategori = await db.Brand.findOne({ where: { id: id } });
+                if (existCategori) {
+                    let updateFields = {
+                        nameBrand: nameBrand,
+                    };
+
+                    if (imageBrand) {
+                        updateFields.imageBrand = imageBrand.originalname;
+                    }
+                    const updateBrand = await db.Brand.update(updateFields, { where: { id: id } });
+                    resolve({ success: true, message: "Cập nhật thông tin thành công" });
+                } else {
+                    resolve({ success: false, message: "Loại thiết bị không tồn tại" });
+                }
+            }
+            catch (error) {
+                console.log(error)
+                reject(error);
+            }
+        })
+    }
+
     async deleteBrand(id) {
         return new Promise(async (resolve, reject) => {
             try {
                 // Kiểm tra có sản phẩm
-                let deleteBrand = await db.Brand.destroy({
+                let countBrand = await db.Product.count({
                     where: {
-                        id: id
+                        ID_Brand: id
                     }
                 })
-                resolve({ success: true, message: "Đã xóa thương hiệu" });
+                if (countBrand > 0) {
+                    resolve({ success: false, message: "Không thể xóa thương hiệu" })
+                }
+                else {
+                    let deleteBrand = await db.Brand.destroy({
+                        where: {
+                            id: id
+                        }
+                    })
+                    resolve({ success: true, message: "Đã xóa thương hiệu" });
+                }
+
             }
             catch (error) {
                 reject(error);
@@ -137,7 +173,11 @@ class ProductService {
     async getCategories() {
         return new Promise(async (resolve, reject) => {
             try {
-                let listCategories = await db.Categori.findAll();
+                let listCategories = await db.Categori.findAll({
+                    include: [{
+                        model: db.Service
+                    }]
+                });
                 // console.log(listCategories)
                 resolve(listCategories);
                 // let categoriCounts = [];
@@ -195,18 +235,55 @@ class ProductService {
     async deleteCategories(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let deleteCategories = await db.Categori.destroy({
-                    where: {
-                        id: id
-                    }
+                let countExist = await db.Operation.count({
+                    where: { ID_Categori: id }
                 })
-                resolve({ success: true, message: "Đã xóa thương hiệu" });
+                if (countExist > 0) {
+                    resolve({ success: false, message: "Không thể xóa loại biết bị" })
+
+                }
+                else {
+                    let deleteCategories = await db.Categori.destroy({
+                        where: {
+                            id: id
+                        }
+                    })
+                    resolve({ success: true, message: "Xóa thành công loại thiết bị" });
+                }
+
             }
             catch (error) {
                 reject(error);
             }
         })
     }
+    async updateCategoriesService(id, idService, nameCategories, imageCategories) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existCategori = await db.Categori.findOne({ where: { id: id } });
+                if (existCategori) {
+                    let updateFields = {
+                        nameCategories: nameCategories,
+                        ID_Service: idService,
+                    };
+
+                    if (imageCategories) {
+                        updateFields.imageCategories = imageCategories.originalname;
+                    }
+                    const updateProduct = await db.Categori.update(updateFields, { where: { id: id } });
+                    resolve({ success: true, message: "Cập nhật thông tin thành công" });
+                } else {
+                    resolve({ success: false, message: "Loại thiết bị không tồn tại" });
+                }
+            }
+            catch (error) {
+                console.log(error)
+                reject(error);
+            }
+        })
+    }
+
+
 }
 
 module.exports = new ProductService();
