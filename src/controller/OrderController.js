@@ -141,6 +141,7 @@ class OrderController {
             const ID_OrderDetail = req.params.id;
             const { totalAmount, listTask } = req.body;
             let data = await orderService.listTaskOrderService(ID_OrderDetail, totalAmount, listTask)
+            return res.json(data)
         }
         catch (e) {
             console.log(e);
@@ -150,6 +151,52 @@ class OrderController {
         }
     }
 
+    async detailListTaskOrder(req, res, next) {
+        try {
+            const ID_DetailOrder = req.params.id;
+            let data = await orderService.detailListTaskOrderService(ID_DetailOrder)
+            return res.json(data)
+
+        } catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
+        }
+
+    }
+
+    async updateTaskOrder(req, res, next) {
+        try {
+            const ID_DetailOrder = req.params.id;
+            const ID_Operation = req.body.operation;
+            const totalAmount = req.body.total;
+            let data = await orderService.updateTaskOrderService(ID_DetailOrder, ID_Operation, totalAmount)
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
+        }
+    }
+
+    async deleteTaskOrder(req, res, next) {
+        try {
+            const ID_TaskRepair = req.params.id;
+            let data = await orderService.deleteTaskOrderService(ID_TaskRepair)
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
+        }
+    }
+
+
     async updateStatusOrder(req, res, next) {
         try {
             const ID_Order = req.params.id;
@@ -158,9 +205,13 @@ class OrderController {
             return res.json(data);
         }
         catch (e) {
-
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
         }
     }
+
 
 
 

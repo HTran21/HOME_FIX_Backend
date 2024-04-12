@@ -15,6 +15,9 @@ router.post("/accept/:id", orderController.acceptOrder)
 router.get("/fullDetail/:id", orderController.fullDetailOrder)
 router.delete("/delete/:id", orderController.deleteOrder)
 router.post("/taskRepair/:id", orderController.listTaskOrder)
+router.get("/detailTaskRepair/:id", orderController.detailListTaskOrder)
+router.put("/updateTaskRepair/:id", orderController.updateTaskOrder)
+router.delete("/deleteTaskRepair/:id", orderController.deleteTaskOrder)
 router.put("/updateStatusOrder/:id", orderController.updateStatusOrder)
 
 module.exports = router;

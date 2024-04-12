@@ -587,21 +587,150 @@ class OrderService {
         })
     }
 
-    async listTaskOrderService(ID_OrderDetail, totalAmount, listTask) {
-        return new Promise(async (reslove, reject) => {
+    async listTaskOrderService(ID_DetailOrder, totalAmount, listTask) {
+        return new Promise(async (resolve, reject) => {
             try {
-                console.log("ID_Order", ID_OrderDetail);
-                console.log("Total Amount", totalAmount);
-                console.log("listTask", listTask)
-                const listTaskandCount = listTask.forEach(task => {
 
-                });
+                for (const task of listTask) {
+                    let createTaskReapir = await db.TaskRepair.create({
+                        ID_DetailOrder: ID_DetailOrder,
+                        ID_Operation: task.id
+                    })
+                }
+
+                const updatePayment = await db.DetailOrder.update({
+                    totalAmount: totalAmount,
+                    paymentStatus: 'UP'
+                }, {
+                    where: { id: ID_DetailOrder }
+                })
+
+                const detailOrder = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder } })
+                if (detailOrder) {
+                    const order = await db.Order.findOne({
+                        where: { id: detailOrder.ID_Order }
+                    });
+                    if (order) {
+                        await db.Order.update({ status: 'S' }, { where: { id: order.id } });
+                        resolve({ success: true, message: "Đã tạo danh sách thao tác thành công" })
+
+                    }
+                    else {
+                        resolve({ success: false, message: "Không tìm thấy đơn hàng" });
+                    }
+
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy chi tiết đơn hàng" });
+                }
+
+
             }
             catch (error) {
                 console.log("Lỗi", error);
                 reject(error)
             }
 
+        })
+    }
+
+    async detailListTaskOrderService(ID_DetailOrder) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let listTask = await db.DetailOrder.findOne({
+                    where: {
+                        id: ID_DetailOrder
+                    },
+                    include: [{
+                        model: db.TaskRepair,
+                        where: {
+                            ID_DetailOrder: ID_DetailOrder
+                        },
+                        include: [{
+                            model: db.Operation,
+                            include: [{
+                                model: db.Categori
+                            }]
+                        }]
+                    }]
+                })
+                resolve(listTask)
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
+    }
+
+    async updateTaskOrderService(ID_DetailOrder, ID_Operation, totalAmount) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await db.TaskRepair.create({
+                    ID_DetailOrder: ID_DetailOrder,
+                    ID_Operation: ID_Operation
+                })
+                await db.DetailOrder.update({
+                    totalAmount: totalAmount
+                }, {
+                    where: { id: ID_DetailOrder }
+                })
+                resolve({ success: true, message: "Đã cập nhật thao tác vào đơn sửa chữa" })
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
+    }
+
+    async deleteTaskOrderService(ID_TaskRepair) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let taskRepair = await db.TaskRepair.findOne({
+                    where: {
+                        id: ID_TaskRepair
+                    },
+                    include: [{
+                        model: db.Operation
+                    }]
+                })
+                let priceOperation = taskRepair.Operation.price;
+                if (taskRepair) {
+                    let ID_DetailOrder = taskRepair.ID_DetailOrder;
+                    let detailOrder = await db.DetailOrder.findOne({
+                        where: {
+                            id: ID_DetailOrder
+                        }
+                    })
+                    if (detailOrder) {
+                        let totalBefore = detailOrder.totalAmount;
+                        let currentTotal = totalBefore - priceOperation;
+                        await db.DetailOrder.update({
+                            totalAmount: currentTotal
+                        }, {
+                            where: {
+                                id: ID_DetailOrder
+                            }
+                        })
+                        await db.TaskRepair.destroy({
+                            where: {
+                                id: ID_TaskRepair
+                            }
+                        })
+                        resolve({ success: true, message: "Xóa thao tác đã thực hiện" })
+                    } else {
+                        resolve({ success: false, message: "Không tìm chi tiết đơn sửa chữa" })
+                    }
+                }
+                else {
+                    resolve({ success: false, message: "Không tìm thấy thao tác đã thực hiện" })
+                }
+
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
         })
     }
 
