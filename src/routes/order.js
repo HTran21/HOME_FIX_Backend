@@ -19,5 +19,6 @@ router.get("/detailTaskRepair/:id", orderController.detailListTaskOrder)
 router.put("/updateTaskRepair/:id", orderController.updateTaskOrder)
 router.delete("/deleteTaskRepair/:id", orderController.deleteTaskOrder)
 router.put("/updateStatusOrder/:id", orderController.updateStatusOrder)
+router.get("/confirmOrder/:id", orderController.getConfirmOrder)
 
 module.exports = router;

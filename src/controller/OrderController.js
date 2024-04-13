@@ -212,6 +212,19 @@ class OrderController {
         }
     }
 
+    async getConfirmOrder(req, res, next) {
+        try {
+            const ID_DetailOrder = req.params.id;
+            let data = await orderService.getConfirmOrderService(ID_DetailOrder)
+            return res.json(data)
+        } catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e)
+            }
+        }
+    }
+
 
 
 

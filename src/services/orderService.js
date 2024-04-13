@@ -89,6 +89,10 @@ class OrderService {
                                     attributes: ['nameService']
                                 }
                             ]
+                        },
+                        {
+                            model: db.DetailOrder,
+
                         }
                     ]
                 });
@@ -651,6 +655,8 @@ class OrderService {
                                 model: db.Categori
                             }]
                         }]
+                    }, {
+                        model: db.Order,
                     }]
                 })
                 resolve(listTask)
@@ -749,6 +755,56 @@ class OrderService {
                     resolve({ success: true, message: "Cập nhật trạng thái thành công" })
                 } else {
                     resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" });
+                }
+
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
+    }
+
+    async getConfirmOrderService(ID_DetailOrder) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existOrder = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder } });
+                if (existOrder) {
+                    let detailOrder = await db.DetailOrder.findOne({
+                        where: {
+                            id: ID_DetailOrder
+                        },
+                        include: [
+                            {
+                                model: db.Order,
+                                include: [{
+                                    model: db.Categori,
+                                    include: [{
+                                        model: db.Service
+                                    }]
+                                }, {
+                                    model: db.Product,
+                                    include: [{
+                                        model: db.Brand
+                                    }]
+                                }]
+                            }, {
+                                model: db.Schedule,
+                                include: [{
+                                    model: db.Repairer
+                                }]
+                            }, {
+                                model: db.TaskRepair,
+                                include: [{
+                                    model: db.Operation
+                                }]
+                            }
+                        ]
+                    });
+                    resolve({ success: true, message: "Tìm thấy chi tiết đơn sửa chữa", detailOrder })
+
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy chi tiết đơn sửa chữa" });
                 }
 
             }
