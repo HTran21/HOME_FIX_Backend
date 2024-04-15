@@ -184,7 +184,7 @@ class ScheduleService {
         return new Promise(async (resolve, reject) => {
             try {
                 const formattedCurrentDate = new Date(currentDate).toISOString();
-                let listWork = await db.Schedule.findAll({
+                let listWork = await db.Schedule.findOne({
                     where: {
                         ID_Repairer: id,
                         workDay: {

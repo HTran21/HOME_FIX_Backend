@@ -472,68 +472,103 @@ class OrderService {
     async fullDetailOrderService(ID_OrderDetail) {
         return new Promise(async (resolve, reject) => {
             try {
-                let data = await db.DetailOrder.findOne({
+
+                let exsitDetailOrder = await db.DetailOrder.findOne({
                     where: {
-                        id: ID_OrderDetail
+                        id: ID_OrderDetail,
+
                     },
                     include: [{
                         model: db.Order,
                         include: [{
-                            model: db.Categori,
-                            attributes: ['nameCategories'],
+                            model: db.Product,
                             include: [{
-                                model: db.Service,
-                                attributes: ['nameService']
+                                model: db.Brand
+                            }]
+                        }, {
+                            model: db.Categori,
+                            include: [{
+                                model: db.Service
                             }]
                         }]
-
                     },
                     {
                         model: db.Schedule,
                         include: [{
-                            model: db.Repairer,
-                            attributes: ['usernameRepairer']
+                            model: db.Repairer
                         }]
                     }]
                 })
-                if (data.Order.ID_Product) {
-                    let data = await db.DetailOrder.findOne({
-                        where: {
-                            ID_Order: ID_Order
-                        },
-                        include: [{
-                            model: db.Order,
-                            include: [
-                                {
-                                    model: db.Product,
-                                    attributes: ['ID_Brand', 'nameProduct'],
-                                    include: [{
-                                        model: db.Brand,
-                                        attributes: ['nameBrand']
-                                    }]
-                                },
-                                {
-                                    model: db.Categori,
-                                    attributes: ['nameCategories'],
-                                    include: [{
-                                        model: db.Service,
-                                        attributes: ['nameService']
-                                    }]
-                                }]
 
-                        }, {
-                            model: db.Schedule,
-                            include: [{
-                                model: db.Repairer,
-                                attributes: ['usernameRepairer']
-                            }]
-                        }]
-                    })
-                    resolve(data)
+                if (exsitDetailOrder) {
+                    resolve({ success: true, exsitDetailOrder })
                 }
                 else {
-                    resolve(data)
+                    resolve({ success: false, message: "Không tìm thấy đơn hàng" })
                 }
+
+                // let data = await db.DetailOrder.findOne({
+                //     where: {
+                //         id: ID_OrderDetail
+                //     },
+                //     include: [{
+                //         model: db.Order,
+                //         include: [{
+                //             model: db.Categori,
+                //             attributes: ['nameCategories'],
+                //             include: [{
+                //                 model: db.Service,
+                //                 attributes: ['nameService']
+                //             }]
+                //         }]
+
+                //     },
+                //     {
+                //         model: db.Schedule,
+                //         include: [{
+                //             model: db.Repairer,
+                //             attributes: ['usernameRepairer']
+                //         }]
+                //     }]
+                // })
+                // if (data.Order.ID_Product) {
+                //     let data = await db.DetailOrder.findOne({
+                //         where: {
+                //             ID_Order: ID_Order
+                //         },
+                //         include: [{
+                //             model: db.Order,
+                //             include: [
+                //                 {
+                //                     model: db.Product,
+                //                     attributes: ['ID_Brand', 'nameProduct'],
+                //                     include: [{
+                //                         model: db.Brand,
+                //                         attributes: ['nameBrand']
+                //                     }]
+                //                 },
+                //                 {
+                //                     model: db.Categori,
+                //                     attributes: ['nameCategories'],
+                //                     include: [{
+                //                         model: db.Service,
+                //                         attributes: ['nameService']
+                //                     }]
+                //                 }]
+
+                //         }, {
+                //             model: db.Schedule,
+                //             include: [{
+                //                 model: db.Repairer,
+                //                 attributes: ['usernameRepairer']
+                //             }]
+                //         }]
+                //     })
+                //     resolve(data)
+                // }
+                // else {
+                //     resolve(data)
+                // }
 
                 // let data = await db.Order.findOne({
                 //     where: { id: ID_Order },
@@ -805,6 +840,31 @@ class OrderService {
 
                 } else {
                     resolve({ success: false, message: "Không tìm thấy chi tiết đơn sửa chữa" });
+                }
+
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
+    }
+
+    async updateStatusPayment(ID_DetailOrder, paymentStatus) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existOrder = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder } });
+                if (existOrder) {
+                    await db.DetailOrder.update({
+                        paymentStatus: paymentStatus
+                    }, {
+                        where: {
+                            id: ID_DetailOrder
+                        }
+                    })
+                    resolve({ success: true, existOrder })
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy đơn chi tiết sửa chữa" });
                 }
 
             }

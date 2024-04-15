@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Staff.hasMany(models.RoomMessage, {
+        sourceKey: "id",
+        foreignKey: "userTwo",
+      });
     }
   }
   Staff.init({

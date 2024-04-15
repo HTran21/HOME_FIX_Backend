@@ -2,6 +2,8 @@ const db = require('../app/models/index');
 const multer = require('multer');
 const storage = require("../middleware/upload_image");
 const userService = require("../services/userService");
+const orderService = require('../services/orderService');
+const { where } = require('sequelize');
 
 class UserController {
     async test(req, res, next) {
@@ -52,7 +54,38 @@ class UserController {
         }
         catch (e) {
             console.log(e);
-            return res.json({ error });
+            return res.json({ e });
+        }
+    }
+
+    async handleBooking(req, res, next) {
+        try {
+            const ID_DetailOrder = req.body.ID_DetailOrder;
+            const paymentMethod = req.body.paymentMethod;
+
+            if (paymentMethod !== "vnpay" && paymentMethod !== "cash") {
+                return res.json({ success: false, message: "Dữ liệu về phương thức thanh toán không chính xác" })
+            }
+            let existDetail = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder } })
+            if (existDetail) {
+                await db.DetailOrder.update({
+                    paymentMethod: paymentMethod
+                }, {
+                    where: {
+                        id: ID_DetailOrder
+                    }
+                })
+                let data = await orderService.getConfirmOrderService(ID_DetailOrder)
+                req.detailOrder = data;
+                next();
+            } else {
+                return res.json({ success: false, message: "Không tìm thấy đơn hàng" })
+            }
+
+        }
+        catch (error) {
+            console.log(error)
+            return res.json({ success: false, message: "Đã xảy ra lỗi khi xử lý yêu cầu thanh toán" });
         }
     }
 }

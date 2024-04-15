@@ -15,6 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "id",
         foreignKey: "ID_User",
       });
+
+      User.hasMany(models.RoomMessage, {
+        sourceKey: "id",
+        foreignKey: "userOne",
+      });
     }
   }
   User.init({
