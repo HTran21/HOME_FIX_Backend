@@ -2,7 +2,7 @@ const db = require('../app/models/index')
 const multer = require('multer');
 const storage = require("../middleware/upload_image");
 const adminService = require('../services/adminService');
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 
 class AdminController {
 
@@ -167,13 +167,24 @@ class AdminController {
         try {
             const id = req.params.id;
             // Kiểm tra thợ có đơn sửa chữa
-
-            let deleteUser = await db.Repairer.destroy({
+            const existUser = await db.Repairer.findOne({
                 where: {
                     id: id
                 }
             })
-            return res.json({ success: true, message: "Đã xóa người dùng" });
+            if (existUser) {
+                let deleteUser = await db.Repairer.destroy({
+                    where: {
+                        id: id
+                    }
+                })
+                return res.json({ success: true, message: "Đã xóa người dùng" });
+            }
+            else {
+                return res.json({ success: false, message: "Không tìm thấy người dùng" });
+            }
+
+
 
         }
         catch (e) {

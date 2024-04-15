@@ -109,49 +109,56 @@ class OrderService {
     async detailOrderService(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let data = await db.Order.findOne({
-                    where: { id: id },
-                    include: [
-                        {
-                            model: db.Categori,
-                            attributes: ['ID_Service', 'nameCategories'],
-                            include: [
-                                {
-                                    model: db.Service,
-                                    attributes: ['nameService']
-                                }
-                            ]
-                        }
-                    ]
-                });
-                if (data.ID_Product) {
+                let existOrder = await db.Order.findOne({
+                    where: { id: id }
+                })
+                if (existOrder) {
                     let data = await db.Order.findOne({
                         where: { id: id },
                         include: [
                             {
-                                model: db.Product,
-                                attributes: ['ID_Brand', 'nameProduct'],
-                                include: [{
-                                    model: db.Brand,
-                                    attributes: ['nameBrand']
-                                }]
-                            },
-                            {
                                 model: db.Categori,
                                 attributes: ['ID_Service', 'nameCategories'],
-                                include: [{
-                                    model: db.Service,
-                                    attributes: ['nameService']
-                                }]
-                            },
+                                include: [
+                                    {
+                                        model: db.Service,
+                                        attributes: ['nameService']
+                                    }
+                                ]
+                            }
                         ]
-                    })
-                    // console.log("Co ID product", order)
-                    resolve({ data })
-                } else {
-                    resolve({ data });
-                    // console.log("Khong co id product", detailOrder)
+                    });
+                    if (data.ID_Product) {
+                        let data = await db.Order.findOne({
+                            where: { id: id },
+                            include: [
+                                {
+                                    model: db.Product,
+                                    attributes: ['ID_Brand', 'nameProduct'],
+                                    include: [{
+                                        model: db.Brand,
+                                        attributes: ['nameBrand']
+                                    }]
+                                },
+                                {
+                                    model: db.Categori,
+                                    attributes: ['ID_Service', 'nameCategories'],
+                                    include: [{
+                                        model: db.Service,
+                                        attributes: ['nameService']
+                                    }]
+                                },
+                            ]
+                        })
+                        // console.log("Co ID product", order)
+                        resolve({ data })
+                    } else {
+                        resolve({ data });
+                        // console.log("Khong co id product", detailOrder)
 
+                    }
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy đơn hàng" })
                 }
             }
             catch (error) {
@@ -165,22 +172,32 @@ class OrderService {
     async updateOrderService(id, idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepair) {
         return new Promise(async (resolve, reject) => {
             try {
-                let updateOrder = await db.Order.update({
-                    ID_User: idUser,
-                    ID_Categori: idCategori,
-                    ID_Product: idProduct,
-                    fullName: fullName,
-                    address: address,
-                    phone: phone,
-                    email: email,
-                    desProblem: desRepair,
-                    desireDate: dateRepair,
-                }, {
+                let existOrder = await db.Order.findOne({
                     where: {
                         id: id
                     }
                 })
-                resolve({ success: true, message: "Cập nhật đơn sửa chữa thành công" });
+                if (existOrder) {
+                    let updateOrder = await db.Order.update({
+                        ID_User: idUser,
+                        ID_Categori: idCategori,
+                        ID_Product: idProduct,
+                        fullName: fullName,
+                        address: address,
+                        phone: phone,
+                        email: email,
+                        desProblem: desRepair,
+                        desireDate: dateRepair,
+                    }, {
+                        where: {
+                            id: id
+                        }
+                    })
+                    resolve({ success: true, message: "Cập nhật đơn sửa chữa thành công" });
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" });
+                }
+
             }
             catch (error) {
                 console.log("Lỗi", error);

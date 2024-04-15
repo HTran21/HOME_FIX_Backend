@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
         const res = await messageService.createRoom(ID_User)
         if (res) {
             socket.join(+res.data.id)
-            console.log("Tham gia phong chat: ", res.data.id)
+            // console.log("Tham gia phong chat: ", res.data.id)
             socket.emit("room_created", res.data.id)
         }
         // const res = await MessageService.createRoom({ userOne: ID_User });
@@ -81,13 +81,13 @@ io.on("connection", (socket) => {
         const { room } = data;
         socket.join(+room);
         socket.emit("room_created", room);
-        console.log("admin tham gia phong chat : ", room);
+        // console.log("admin tham gia phong chat : ", room);
     });
 
     socket.on("send_message", async (data) => {
         const { room } = data;
-        console.log("room", room);
-        console.log("Toi day")
+        // console.log("room", room);
+        // console.log("Toi day")
         socket.to(room).emit("receive_message", data);
     });
 });

@@ -146,21 +146,32 @@ class ProductService {
         return new Promise(async (resolve, reject) => {
             try {
                 // Kiểm tra có sản phẩm
-                let countBrand = await db.Product.count({
+                let existBrand = await db.Brand.findOne({
                     where: {
-                        ID_Brand: id
+                        id: id
                     }
                 })
-                if (countBrand > 0) {
-                    resolve({ success: false, message: "Không thể xóa thương hiệu" })
-                }
-                else {
-                    let deleteBrand = await db.Brand.destroy({
+                if (existBrand) {
+                    let countBrand = await db.Product.count({
                         where: {
-                            id: id
+                            ID_Brand: id
                         }
                     })
-                    resolve({ success: true, message: "Đã xóa thương hiệu" });
+                    if (countBrand > 0) {
+                        resolve({ success: false, message: "Không thể xóa thương hiệu" })
+                    }
+                    else {
+                        let deleteBrand = await db.Brand.destroy({
+                            where: {
+                                id: id
+                            }
+                        })
+                        resolve({ success: true, message: "Đã xóa thương hiệu" });
+                    }
+
+                }
+                else {
+                    resolve({ success: false, message: "Không tìm thấy thương hiệu" });
                 }
 
             }
@@ -235,21 +246,31 @@ class ProductService {
     async deleteCategories(id) {
         return new Promise(async (resolve, reject) => {
             try {
-                let countExist = await db.Operation.count({
-                    where: { ID_Categori: id }
+                let existCategori = await db.Categori.findOne({
+                    where: {
+                        id: id
+                    }
                 })
-                if (countExist > 0) {
-                    resolve({ success: false, message: "Không thể xóa loại biết bị" })
-
-                }
-                else {
-                    let deleteCategories = await db.Categori.destroy({
-                        where: {
-                            id: id
-                        }
+                if (existCategori) {
+                    let countExist = await db.Operation.count({
+                        where: { ID_Categori: id }
                     })
-                    resolve({ success: true, message: "Xóa thành công loại thiết bị" });
+                    if (countExist > 0) {
+                        resolve({ success: false, message: "Không thể xóa loại biết bị" })
+
+                    }
+                    else {
+                        let deleteCategories = await db.Categori.destroy({
+                            where: {
+                                id: id
+                            }
+                        })
+                        resolve({ success: true, message: "Xóa thành công loại thiết bị" });
+                    }
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy loại thiết bị" });
                 }
+
 
             }
             catch (error) {
