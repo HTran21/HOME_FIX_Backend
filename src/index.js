@@ -11,6 +11,7 @@ const socketIo = require("socket.io")
 
 const route = require("./routes");
 const messageService = require('./services/messageService');
+const payementService = require('./services/payementService');
 
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -90,6 +91,14 @@ io.on("connection", (socket) => {
         // console.log("Toi day")
         socket.to(room).emit("receive_message", data);
     });
+
+    socket.on("confirm_payment", async (data) => {
+        const { ID_DetailOrder } = data
+        // console.log("ID_DetailOrder socket", data)
+        // const res = await payementService.handleConfirmPayment(ID_DetailOrder)
+        io.emit("confirm_payment_success")
+
+    })
 });
 
 

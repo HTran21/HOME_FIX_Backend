@@ -4,6 +4,8 @@ const db = require('../app/models/index');
 
 const moment = require('moment');
 const orderService = require('../services/orderService');
+const { where } = require('sequelize');
+const payementService = require('../services/payementService');
 // const sortObject = require("../untils")
 
 class PaymentController {
@@ -145,6 +147,48 @@ class PaymentController {
         catch (e) {
             console.log(e);
             return res.json({ e });
+        }
+    }
+
+    async handleCreatePaymentCash(req, res, next) {
+        try {
+            const ID_DetailOrder = req.body.ID_DetailOrder;
+            const paymentMethod = req.body.paymentMethod;
+            let existDetailOrder = await db.DetailOrder.findOne({
+                where: {
+                    id: ID_DetailOrder
+                }
+            })
+            if (existDetailOrder) {
+                await db.DetailOrder.update({
+                    paymentMethod: paymentMethod,
+                    paymentStatus: 'W'
+                }, {
+                    where: {
+                        id: ID_DetailOrder
+                    }
+                })
+                return res.json({ success: true, message: "Vui lòng chờ thợ xác nhận" })
+            }
+            else {
+                return res.json({ success: false, message: "Không tìm thấy đơn hàng" })
+            }
+        }
+        catch (e) {
+            console.log(e);
+            return res.json(e)
+        }
+    }
+
+    async handleConfirmPayment(req, res, next) {
+        try {
+            const { ID_DetailOrder } = req.body;
+            let data = await payementService.handleConfirmPayment(ID_DetailOrder)
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            return res.json(e)
         }
     }
 

@@ -699,7 +699,7 @@ class OrderService {
                     include: [{
                         model: db.TaskRepair,
                         where: {
-                            ID_DetailOrder: ID_DetailOrder
+                            ID_DetailOrder: ID_DetailOrder,
                         },
                         include: [{
                             model: db.Operation,
