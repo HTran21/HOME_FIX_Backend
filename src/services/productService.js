@@ -84,6 +84,41 @@ class ProductService {
         })
     }
 
+
+    async deleteProductService(ID_Product) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existProduct = await db.Product.findOne({
+                    where: {
+                        id: ID_Product
+                    }
+                })
+                if (existProduct) {
+                    let countProduct = await db.Order.count({
+                        where: {
+                            ID_Product: ID_Product
+                        }
+                    })
+                    if (countProduct > 0) {
+                        resolve({ success: false, message: "Không thể xóa sản phẩm" })
+                    } else {
+                        await db.Product.destroy({
+                            where: {
+                                id: ID_Product
+                            }
+                        })
+                        resolve({ success: true, message: "Xóa sản phẩm thành công" })
+                    }
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy sản phẩm" })
+                }
+            }
+            catch (error) {
+                reject(error)
+            }
+        })
+    }
+
     async getBrand() {
         return new Promise(async (resolve, reject) => {
             try {

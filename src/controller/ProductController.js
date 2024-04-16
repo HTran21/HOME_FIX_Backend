@@ -161,6 +161,18 @@ class ProductController {
         }
     }
 
+    async deleteProduct(req, res, next) {
+        try {
+            const ID_Product = req.query.ID_Product;
+            let data = await productService.deleteProductService(ID_Product)
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(400).json({ error: e });
+        }
+    }
+
     async getBrand(req, res, next) {
         try {
             const search = req.query.search;
