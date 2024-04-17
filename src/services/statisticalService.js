@@ -321,6 +321,172 @@ class StatisticalService {
         })
     }
 
+    async overviewJobService(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const ID_Repairer = data.ID_Repairer;
+                let existRepairer = await db.Repairer.findOne({
+                    where: {
+                        id: ID_Repairer
+                    }
+                })
+                if (existRepairer) {
+                    let listJob = await db.DetailOrder.findAll({
+                        include: [{
+                            model: db.Schedule,
+                            where: {
+                                ID_Repairer: ID_Repairer
+                            }
+                        }, {
+                            model: db.Order,
+                        }]
+                    })
+                    resolve({ success: true, message: "Danh sách công việc", listJob })
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy người dùng" })
+
+                }
+
+            }
+            catch (error) {
+                console.log("Error", error)
+                reject(error);
+            }
+        })
+    }
+
+    async jobStatisticalService(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const ID_Repairer = data.id;
+                let existRepairer = await db.Repairer.findOne({
+                    where: {
+                        id: ID_Repairer
+                    }
+                })
+                if (existRepairer) {
+                    let listJob = await db.DetailOrder.findAll({
+                        include: [{
+                            model: db.Schedule,
+                            attributes: ['workDay'],
+                            where: {
+                                ID_Repairer: ID_Repairer
+                            }
+                        }, {
+                            model: db.Order,
+                        }]
+                    })
+
+
+                    let jobTotalMap = {};
+                    listJob.forEach(item => {
+                        const formattedDate = moment(item.Schedule.workDay).format('YYYY-MM-DD');
+                        // console.log("Ngay", formattedDate)
+                        if (!jobTotalMap[formattedDate]) {
+                            jobTotalMap[formattedDate] = {
+                                count: 1
+                            }
+                        } else {
+                            jobTotalMap[formattedDate].count++
+                        }
+                    });
+
+                    if (data.dateSend) {
+                        if (data.dateSend.type === 'datepicker') {
+                            const startDate = moment(data.dateSend.data[0]);
+                            const endDate = moment(data.dateSend.data[1]);
+
+                            let jobTotal = [];
+
+                            for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
+                                const formattedDate = date.format('YYYY-MM-DD');
+                                if (jobTotalMap[formattedDate]) {
+                                    jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
+                                } else {
+                                    jobTotal.push({ workDay: formattedDate, count: 0 });
+                                }
+                            }
+
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal });
+                        }
+                        if (data.dateSend.type === 'month') {
+                            const month = moment(data.dateSend.data, "YYYY-MM");
+                            const daysInMonth = month.daysInMonth();
+                            const firstDayOfMonth = month.startOf('month');
+                            let jobTotal = [];
+                            for (let i = 0; i < daysInMonth; i++) {
+                                const currentDay = firstDayOfMonth.clone().add(i, 'days');
+                                const formattedDate = currentDay.format('YYYY-MM-DD');
+                                if (jobTotalMap[formattedDate]) {
+                                    jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
+                                } else {
+                                    jobTotal.push({ workDay: formattedDate, count: 0 });
+                                }
+                            }
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa theo tháng", jobTotal });
+
+
+                        }
+                        if (data.dateSend.type === 'year') {
+                            const year = parseInt(data.dateSend.data);
+                            const monthsOfYear = [];
+                            let jobTotal = [];
+
+                            for (let month = 0; month < 12; month++) {
+                                const formattedMonth = moment().year(year).month(month).startOf('month').format('YYYY-MM');
+                                monthsOfYear.push(formattedMonth);
+                                jobTotal.push({ workDay: formattedMonth, count: 0 });
+                            }
+
+                            for (const date in jobTotalMap) {
+                                const monthOfYear = moment(date).format('YYYY-MM');
+                                const index = monthsOfYear.indexOf(monthOfYear);
+                                if (index !== -1) {
+                                    jobTotal[index].count += jobTotalMap[date].count;
+                                }
+                            }
+
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sủa chữa theo năm", jobTotal });
+                        }
+
+                        else {
+                            resolve({ success: false, message: "Vui lòng chọn thời gian" });
+                        }
+
+                    }
+                    else {
+                        const today = moment();
+                        const startDate = today.clone().startOf('week');
+                        const endDate = today.clone().endOf('week');
+
+                        let jobTotal = [];
+
+                        for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
+                            const formattedDate = date.format('YYYY-MM-DD');
+                            if (jobTotalMap[formattedDate]) {
+                                jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
+                            } else {
+                                jobTotal.push({ workDay: formattedDate, count: 0 });
+                            }
+                        }
+
+                        resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal });
+                    }
+
+
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy người dùng" })
+
+                }
+
+            }
+            catch (error) {
+                console.log("Error", error)
+                reject(error);
+            }
+        })
+    }
+
 }
 
 module.exports = new StatisticalService();

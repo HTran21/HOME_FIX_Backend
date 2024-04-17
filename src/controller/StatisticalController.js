@@ -52,6 +52,28 @@ class StatisticalController {
         }
     }
 
+    async overviewJob(req, res, next) {
+        try {
+            const data = await statisticalService.overviewJobService(req.query)
+            return res.json(data)
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
+        }
+    }
+
+    async jobStatistical(req, res, next) {
+        try {
+            const data = await statisticalService.jobStatisticalService(req.query)
+            return res.json(data)
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
+        }
+    }
+
 }
 
 module.exports = new StatisticalController();
