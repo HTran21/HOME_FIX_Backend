@@ -2,7 +2,7 @@ const db = require('../app/models/index')
 const multer = require('multer');
 const storage = require("../middleware/upload_image");
 const adminService = require('../services/adminService');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 
 class AdminController {
 
@@ -15,7 +15,10 @@ class AdminController {
                         [Op.or]: [
                             { usernameStaff: { [Op.like]: `%${search}%` } },
                             { emailStaff: { [Op.like]: `%${search}%` } },
-                        ]
+                        ],
+                        status: {
+                            [Op.ne]: 'D'
+                        }
                     },
                     attributes: [
                         ['id', 'id'],
@@ -33,7 +36,10 @@ class AdminController {
                         [Op.or]: [
                             { usernameRepairer: { [Op.like]: `%${search}%` } },
                             { emailRepairer: { [Op.like]: `%${search}%` } },
-                        ]
+                        ],
+                        status: {
+                            [Op.ne]: 'D'
+                        }
                     },
                     attributes: [
                         ['id', 'id'],
@@ -63,7 +69,12 @@ class AdminController {
                         ['addressStaff', 'address'],
                         ['avatarStaff', 'avatar'],
                         ['role', 'role']
-                    ]
+                    ],
+                    where: {
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    }
                 });
                 const repairers = await db.Repairer.findAll({
                     attributes: [
@@ -76,7 +87,12 @@ class AdminController {
                         ['avatarRepairer', 'avatar'],
                         ['role', 'role'],
                         ['ID_Service', 'skill']
-                    ]
+                    ],
+                    where: {
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    }
                 });
 
                 const users = staffs.concat(repairers);
@@ -163,6 +179,75 @@ class AdminController {
         }
     }
 
+    async updateRepairer(req, res, next) {
+        try {
+            const upload = multer({ storage: storage }).single('avatar');
+
+            upload(req, res, async function (err) {
+                if (err instanceof multer.MulterError) {
+                    res.send(err);
+                }
+                else if (err) {
+                    res.send(err);
+                } else {
+                    try {
+
+                        const id = req.params.id;
+                        const file = req.file;
+                        if (file) {
+                            const { username, position, email, phone, address, specialize } = req.body;
+                            const avatar = req.file.originalname;
+                            const updateUser = await db.Repairer.update({
+                                usernameRepairer: username,
+                                position: position,
+                                emailRepairer: email,
+                                phoneRepairer: phone,
+                                addressRepairer: address,
+                                avatarRepairer: avatar
+                            }, {
+                                where: {
+                                    id
+                                }
+                            })
+                            return res.json({ success: true, message: "Cập nhật thông tin thành công" })
+
+                        } else {
+                            const { username, position, email, phone, address, specialize } = req.body;
+                            const updateUser = await db.Repairer.update({
+                                usernameRepairer: username,
+                                position: position,
+                                emailRepairer: email,
+                                phoneRepairer: phone,
+                                addressRepairer: address,
+                            }, {
+                                where: {
+                                    id
+                                }
+                            })
+                            return res.json({ success: true, message: "Cập nhật thông tin thành công" })
+
+                        }
+                        // let data = await repairerService.updateREpairer(username, password, position, email, avatar, phone, address, specialize)
+                        // return res.json(data);
+
+
+                    }
+                    catch (error) {
+                        console.log(error)
+                        return res.json(error);
+                    }
+
+                }
+            })
+        }
+        catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+        }
+    }
+
     async deleteUser(req, res, next) {
         try {
             const id = req.params.id;
@@ -173,12 +258,49 @@ class AdminController {
                 }
             })
             if (existUser) {
-                let deleteUser = await db.Repairer.destroy({
+                let listSchedule = await db.Schedule.findAll({
                     where: {
-                        id: id
-                    }
+                        ID_Repairer: id
+                    },
+                    raw: true
                 })
-                return res.json({ success: true, message: "Đã xóa người dùng" });
+                // console.log(listSchedule)
+                if (listSchedule) {
+                    let countRepair = 0;
+                    for (const schedule of listSchedule) {
+                        let existOrderForRepairer = await db.DetailOrder.findAll({
+                            where: {
+                                ID_Schedule: schedule.id,
+                            },
+                            include: [{
+                                model: db.Order,
+                                where: {
+                                    status: 'A'
+                                }
+                            }],
+                            raw: true
+                        });
+
+                        if (existOrderForRepairer.length !== 0) {
+                            countRepair++;
+                        }
+                    }
+                    if (countRepair > 0) {
+                        return res.json({ success: false, message: "Không thể xóa người dùng" });
+                    }
+                    else {
+                        await db.Repairer.update({
+                            status: 'D'
+                        }, {
+                            where: {
+                                id: id
+                            }
+                        })
+                        return res.json({ success: true, message: "Xóa người dùng thành công" });
+                    }
+                }
+
+
             }
             else {
                 return res.json({ success: false, message: "Không tìm thấy người dùng" });

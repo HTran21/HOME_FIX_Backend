@@ -2,6 +2,7 @@ const db = require('../app/models/index')
 const AuthenticationService = require("../services/authenService");
 const multer = require('multer');
 const storage = require("../middleware/upload_image")
+const { Op } = require('sequelize');
 
 const jwt = require("jsonwebtoken");
 

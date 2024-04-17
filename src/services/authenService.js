@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const db = require('../app/models/index');
 const bcrypt = require('bcrypt');
+const { Op } = require('sequelize');
 
 class AuthenticationService {
     async registerServiceStaff(usernameStaff, passwordStaff, position, emailStaff, phoneStaff, addressStaff, role, status) {
@@ -98,9 +99,30 @@ class AuthenticationService {
     async loginService(email, password) {
         return new Promise(async (resolve, reject) => {
             try {
-                let user = await db.User.findOne({ where: { email: email } });
-                let staff = await db.Staff.findOne({ where: { emailStaff: email } });
-                let repairer = await db.Repairer.findOne({ where: { emailRepairer: email } });
+                let user = await db.User.findOne({
+                    where: {
+                        email: email,
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    }
+                });
+                let staff = await db.Staff.findOne({
+                    where: {
+                        emailStaff: email,
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    }
+                });
+                let repairer = await db.Repairer.findOne({
+                    where: {
+                        emailRepairer: email,
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    }
+                });
 
                 // if (!user) {
 

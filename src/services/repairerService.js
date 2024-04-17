@@ -60,31 +60,49 @@ class RepairerService {
         })
     }
 
-    async updateREpairer(username, password, position, email, avatar, phone, address, specialize) {
+    async updateProfileService(id, avatar, username, email, phone, address) {
         return new Promise(async (resolve, reject) => {
             try {
 
-                // if (!user) {
-                //     const hashedPassword = await bcrypt.hash(passwordStaff, 10);
+                let existRepairer = await db.Repairer.findOne({ where: { id: id } });
+                if (existRepairer) {
+                    const emailChanged = existRepairer.emailRepairer !== email;
 
-                //     // let newUser = await db.Staff.create({
-                //     //     usernameStaff: usernameStaff,
-                //     //     passwordStaff: hashedPassword,
-                //     //     position: position,
-                //     //     emailStaff: emailStaff,
-                //     //     phoneStaff: phoneStaff,
-                //     //     addressStaff: addressStaff,
-                //     //     role: role,
-                //     //     status: status
-                //     // });
+                    let updateFields = {
+                        usernameRepairer: username,
+                        emailRepairer: email,
+                        phoneRepairer: phone,
+                        addressRepairer: address
+                    };
 
-                //     // console.log("New User", newUser);
-                //     resolve({ success: true, message: "Create successful", data: { newUser } });
-                // } else {
-                //     reject({ success: false, message: "User already exists" });
-                // }
+                    if (avatar) {
+                        updateFields.avatarRepairer = avatar.originalname;
+                    }
+                    const updateProfile = await db.Repairer.update(updateFields, { where: { id: id } });
+
+                    const profileRepaier = await db.Repairer.findOne({
+                        where: { id: id },
+                        attributes: ['id', 'role', 'usernameRepairer', 'emailRepairer', 'phoneRepairer', 'addressRepairer', 'avatarRepairer']
+                    });
+                    const dataToken = {
+                        role: profileRepaier.role,
+                        id: profileRepaier.id,
+                        username: profileRepaier.usernameRepairer,
+                        email: profileRepaier.emailRepairer,
+                        phone: profileRepaier.phoneRepairer,
+                        address: profileRepaier.addressRepairer,
+                        avatar: profileRepaier.avatarRepairer
+                    }
+                    const access_token = jwt.sign(dataToken, 'access_token'
+                        // , { expiresIn: '30m' }
+                    )
+                    resolve({ success: true, message: "Cập nhật thông tin thành công", emailChange: emailChanged, data: { access_token } });
+                } else {
+                    resolve({ success: false, message: "Người dùng không tồn tại" });
+                }
             }
             catch (error) {
+                console.log("Error", error)
                 reject(error);
             }
         })
