@@ -92,6 +92,13 @@ class OrderService {
                         },
                         {
                             model: db.DetailOrder,
+                            include: [{
+                                model: db.Schedule,
+                                include: [{
+                                    model: db.Repairer,
+                                    attributes: { exclude: ['passwordRepairer'] }
+                                }]
+                            }]
 
                         }
                     ]

@@ -99,6 +99,13 @@ io.on("connection", (socket) => {
         io.emit("confirm_payment_success")
 
     })
+    socket.on("accept_form", async (data) => {
+        // const { ID_DetailOrder } = data
+        // console.log("ID_DetailOrder socket", data)
+        // const res = await payementService.handleConfirmPayment(ID_DetailOrder)
+        io.emit("accept_form_success")
+
+    })
 });
 
 
