@@ -69,12 +69,6 @@ io.on("connection", (socket) => {
             // console.log("Tham gia phong chat: ", res.data.id)
             socket.emit("room_created", res.data.id)
         }
-        // const res = await MessageService.createRoom({ userOne: ID_User });
-        // if (res) {
-        //     socket.join(+res.DT.id);
-        //     console.log("tham gia phong chat : ", res.DT.id);
-        //     socket.emit("room_created", res.DT.id);
-        // }
         io.emit("update_admin_room_list");
     });
 
@@ -94,18 +88,20 @@ io.on("connection", (socket) => {
 
     socket.on("confirm_payment", async (data) => {
         const { ID_DetailOrder } = data
-        // console.log("ID_DetailOrder socket", data)
-        // const res = await payementService.handleConfirmPayment(ID_DetailOrder)
-        io.emit("confirm_payment_success")
+        const message = data.message
+        console.log("message", message)
+        io.emit("confirm_payment_success", message)
 
     })
-    socket.on("accept_form", async (data) => {
-        // const { ID_DetailOrder } = data
-        // console.log("ID_DetailOrder socket", data)
-        // const res = await payementService.handleConfirmPayment(ID_DetailOrder)
-        io.emit("accept_form_success")
+    // socket.on("accept_form", async (data) => {
+    //     io.emit("accept_form_success")
 
+    // })
+
+    socket.on("orderStatusChange", async (data) => {
+        io.emit("featchOrder")
     })
+
 });
 
 

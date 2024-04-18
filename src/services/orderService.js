@@ -20,6 +20,9 @@ class OrderService {
                                     attributes: ['nameService']
                                 }
                             ]
+                        },
+                        {
+                            model: db.DetailOrder
                         }
                     ]
                 });

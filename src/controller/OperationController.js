@@ -30,6 +30,21 @@ class OperationController {
 
         }
     }
+
+    async operationByCategori(req, res, next) {
+        try {
+            const ID_Categori = req.query.ID_Categori;
+            let data = await operationService.operationByCategori(ID_Categori)
+            return res.json(data)
+        }
+        catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+
+        }
+    }
 }
 
 module.exports = new OperationController();
