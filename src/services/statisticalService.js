@@ -61,6 +61,7 @@ class StatisticalService {
 
                     listAmount.forEach(item => {
                         const formattedDate = moment(item.updatedAt).format('YYYY-MM-DD');
+
                         if (!earningTotalMap[formattedDate]) {
                             earningTotalMap[formattedDate] = item.totalAmount;
                         } else {

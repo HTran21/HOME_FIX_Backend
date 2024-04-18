@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require("../controller/AdminController");
 
 router.get("/getAll", adminController.getAllUser);
+router.get("/getCustomer", adminController.getAllCustomer);
 router.post("/repairer", adminController.createRepairer)
 router.put("/repairer/:id", adminController.updateRepairer)
 router.post("/service", adminController.addService);

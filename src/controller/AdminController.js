@@ -317,6 +317,39 @@ class AdminController {
         }
     }
 
+    async getAllCustomer(req, res, next) {
+        try {
+            const search = req.query.search;
+            if (search) {
+                const listCustomer = await db.User.findAll({
+                    where: {
+                        [Op.or]: [
+                            { username: { [Op.like]: `%${search}%` } },
+                            { email: { [Op.like]: `%${search}%` } },
+                        ],
+                        status: {
+                            [Op.ne]: 'D'
+                        }
+                    },
+
+                });
+                return res.json({ success: true, message: "Danh sách khách hàng", listCustomer });
+
+
+            }
+            else {
+                let listCustomer = await db.User.findAll();
+                return res.json({ success: true, message: "Danh sách khách hàng", listCustomer });
+            }
+        }
+        catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+        }
+    }
+
 
 
 }

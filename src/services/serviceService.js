@@ -74,7 +74,16 @@ class BlogService {
         return new Promise(async (resolve, reject) => {
             try {
 
-                const operationExists = await db.Operation.findOne({ where: { ID_Service: id } });
+                const operationExists = await db.Operation.findAll({
+                    include: [{
+                        model: db.Categori,
+                        where: {
+                            ID_Service: id
+                        },
+                        raw: true
+                    }]
+                });
+
                 if (!operationExists) {
                     let deleteDetailService = await db.Service.destroy({
                         where: {
@@ -89,6 +98,7 @@ class BlogService {
 
             }
             catch (error) {
+                console.log("Loi", error)
                 reject(error);
             }
         })

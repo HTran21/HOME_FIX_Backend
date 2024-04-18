@@ -56,6 +56,19 @@ class AdminService {
             }
         })
     }
+
+    async getAllCustomerService() {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let listCustomer = await db.User.findAll();
+                resolve({ success: true, message: "Danh sách khách hàng", listCustomer })
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error);
+            }
+        })
+    }
 }
 
 module.exports = new AdminService();
