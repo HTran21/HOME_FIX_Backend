@@ -58,7 +58,7 @@ route(app);
 
 // Socket.io
 io.on("connection", (socket) => {
-    console.log(`User Connected: ${socket.id}`);
+    // console.log(`User Connected: ${socket.id}`);
 
     socket.on("join_room", async (data) => {
         // const { ID_User, room } = data;

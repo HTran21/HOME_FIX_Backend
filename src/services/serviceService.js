@@ -18,9 +18,14 @@ class BlogService {
         return new Promise(async (resolve, reject) => {
             try {
                 let detailService = await db.Service.findOne({ where: { id: id } });
-                resolve({ detailService });
+                if (detailService) {
+                    resolve({ success: true, message: "Chi tiết dịch vụ", detailService })
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy dịch vụ" })
+                }
             }
             catch (error) {
+                console.log(error)
                 reject(error);
             }
         })
