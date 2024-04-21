@@ -19,9 +19,9 @@ class OrderController {
 
     async createOrder(req, res, next) {
         try {
-            const { idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepair } = req.body;
+            const { idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepairArray } = req.body;
             const status = 'W';
-            let data = await orderService.createOrderService(idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepair, status);
+            let data = await orderService.createOrderService(idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepairArray, status);
             return res.json(data);
         }
         catch (e) {
@@ -62,9 +62,9 @@ class OrderController {
 
     async updateOrder(req, res, next) {
         try {
-            const { idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepair } = req.body;
+            const { idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepairArray } = req.body;
             const id = req.params.id;
-            let data = await orderService.updateOrderService(id, idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepair);
+            let data = await orderService.updateOrderService(id, idUser, fullName, address, phone, email, idCategori, idProduct, desRepair, dateRepairArray);
             return res.json({ data });
         }
         catch (e) {
@@ -109,8 +109,24 @@ class OrderController {
             // console.log("ID_Repair", req.params.id);
             // console.log("body", req.body);
             const ID_Repair = req.params.id;
-            const { idSchedule, timeslot } = req.body;
-            let data = await orderService.acceptOrderService(ID_Repair, idSchedule, timeslot)
+            const { idSchedule } = req.body;
+            let data = await orderService.acceptOrderService(ID_Repair, idSchedule)
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e);
+            }
+        }
+    }
+
+    async acceptOrderTimeSlot(req, res, next) {
+        try {
+            ;
+            const ID_Order = req.params.id;
+            const { selectedTimeSlots } = req.body;
+            let data = await orderService.acceptOrderTimeSlotService(ID_Order, selectedTimeSlots)
             return res.json(data)
         }
         catch (e) {

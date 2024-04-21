@@ -94,6 +94,18 @@ class ScheduleController {
         }
     }
 
+    async getTotalOrderDay(req, res, next) {
+        try {
+            const ID_Schedule = req.params.id
+            let data = await scheduleService.getTotalOrderDayService(ID_Schedule)
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            return res.json(e)
+        }
+    }
+
 
 }
 

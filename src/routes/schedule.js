@@ -8,6 +8,7 @@ router.get("/allDayWork", authenMiddleware, scheduleController.getAllSchedule)
 router.post("/create", repairerMiddleware, scheduleController.createSchedule)
 router.get("/dayWork/:id", repairerMiddleware, scheduleController.listWorkDay);
 router.get("/dayWorkService/:id", authenMiddleware, scheduleController.getDayWorkService)
-router.get("/timeslot/:id", authenMiddleware, scheduleController.getTimeSlot)
+router.get("/timeslot/:id", scheduleController.getTimeSlot)
 router.get("/workRepair/:id", repairerMiddleware, scheduleController.getWorkRepairer)
+router.get("/totalOrderDay/:id", repairerMiddleware, scheduleController.getTotalOrderDay)
 module.exports = router;

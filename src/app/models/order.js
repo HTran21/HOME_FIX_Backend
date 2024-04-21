@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
     phone: DataTypes.STRING,
     email: DataTypes.STRING,
     desProblem: DataTypes.STRING,
-    desireDate: DataTypes.DATE,
+    desireDate: DataTypes.STRING,
     status: DataTypes.STRING,
 
   }, {

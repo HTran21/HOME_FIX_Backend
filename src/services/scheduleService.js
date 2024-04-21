@@ -170,8 +170,17 @@ class ScheduleService {
                     where: {
                         ID_Schedule: idSchedule
                     },
+                    include: [{
+                        model: db.Order,
+                        where: {
+                            status: 'A'
+                        }
+                    }],
+                    attributes: ['timeRepair']
                 })
-                resolve(listTimeSlot)
+                let timeSlotString = listTimeSlot.map(timeslot => timeslot.timeRepair).join(',')
+                let timeSlotArray = timeSlotString.split(',')
+                resolve(timeSlotArray)
             }
             catch (error) {
                 reject(error);
@@ -205,6 +214,28 @@ class ScheduleService {
                     }
                 })
                 resolve(listWork)
+            }
+            catch (error) {
+                reject(error);
+            }
+
+        })
+    }
+
+    async getTotalOrderDayService(ID_Schedule) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existSchedules = await db.Schedule.findByPk(ID_Schedule)
+                if (existSchedules) {
+                    let totalOrderDay = await db.DetailOrder.count({
+                        where: {
+                            ID_Schedule: ID_Schedule
+                        }
+                    })
+                    resolve({ success: true, message: "Tông công việc một ngày của thợ", totalOrderDay })
+                } else {
+                    resolve({ success: true, message: "Không tìm thấy lịch làm việc" })
+                }
             }
             catch (error) {
                 reject(error);
