@@ -87,7 +87,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("confirm_payment", async (data) => {
-        const { id } = data
+        // const { id } = data
         const message = data.message
         // console.log("message", message)
         io.emit("confirm_payment_success", message)
@@ -101,7 +101,6 @@ io.on("connection", (socket) => {
     socket.on("orderStatusChange", async (data) => {
         io.emit("featchOrder")
     })
-
 });
 
 

@@ -2,6 +2,7 @@ const db = require('../app/models/index')
 const multer = require('multer');
 const repairerService = require("../services/repairerService");
 const storage = require("../middleware/upload_image");
+const { Op } = require('sequelize');
 // const operationService = require("../services/operationService");
 // const serviceService = require("../services/serviceService");
 
@@ -64,6 +65,28 @@ class RepairerController {
             if (e) {
                 return res.status(400).json({ error: e });
             }
+        }
+    }
+
+    async getAllRepair(req, res, next) {
+        try {
+            let listRepairer = await db.Repairer.findAll({
+                where: {
+                    status: {
+                        [Op.ne]: 'D'
+                    }
+                },
+                attributes: {
+                    exclude: ['passwordRepairer']
+                },
+                include: [{
+                    model: db.Service
+                }]
+            });
+            return res.json(listRepairer)
+        }
+        catch (e) {
+            return res.status(400).json({ error: e });
         }
     }
 
