@@ -87,9 +87,9 @@ io.on("connection", (socket) => {
     });
 
     socket.on("confirm_payment", async (data) => {
-        const { ID_DetailOrder } = data
+        const { id } = data
         const message = data.message
-        console.log("message", message)
+        // console.log("message", message)
         io.emit("confirm_payment_success", message)
 
     })

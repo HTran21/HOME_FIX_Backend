@@ -182,8 +182,9 @@ class PaymentController {
 
     async handleConfirmPayment(req, res, next) {
         try {
-            const { ID_DetailOrder } = req.body;
-            let data = await payementService.handleConfirmPayment(ID_DetailOrder)
+            const ID_DetailOrder = req.body.id;
+            const paymentMethod = req.body.paymentMethod
+            let data = await payementService.handleConfirmPayment(ID_DetailOrder, paymentMethod)
             return res.json(data)
         }
         catch (e) {

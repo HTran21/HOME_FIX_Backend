@@ -192,28 +192,51 @@ class ScheduleService {
     async getWorkRepairerService(id, currentDate) {
         return new Promise(async (resolve, reject) => {
             try {
-                const formattedCurrentDate = new Date(currentDate).toISOString();
-                let listWork = await db.Schedule.findOne({
-                    where: {
-                        ID_Repairer: id,
-                        workDay: {
-                            [Op.eq]: formattedCurrentDate
-                        }
-                    },
-                    // attributes: ['workDay'],
-                    include: {
-                        model: db.DetailOrder,
-                        include: {
-                            model: db.Order,
-                            include: {
-                                model: db.Categori,
-                                attributes: ['nameCategories']
+                if (currentDate) {
+                    const formattedCurrentDate = new Date(currentDate).toISOString();
+                    let listWork = await db.Schedule.findOne({
+                        where: {
+                            ID_Repairer: id,
+                            workDay: {
+                                [Op.eq]: formattedCurrentDate
                             }
-                        }
+                        },
+                        // attributes: ['workDay'],
+                        include: {
+                            model: db.DetailOrder,
+                            include: {
+                                model: db.Order,
+                                include: {
+                                    model: db.Categori,
+                                    attributes: ['nameCategories']
+                                }
+                            }
 
-                    }
-                })
-                resolve(listWork)
+                        }
+                    })
+                    resolve(listWork)
+                }
+                else {
+                    let listWork = await db.Schedule.findOne({
+                        where: {
+                            ID_Repairer: id,
+                        },
+                        // attributes: ['workDay'],
+                        include: {
+                            model: db.DetailOrder,
+                            include: {
+                                model: db.Order,
+                                include: {
+                                    model: db.Categori,
+                                    attributes: ['nameCategories']
+                                }
+                            }
+
+                        }
+                    })
+                    resolve(listWork)
+                }
+
             }
             catch (error) {
                 reject(error);

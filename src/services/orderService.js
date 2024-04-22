@@ -982,7 +982,10 @@ class OrderService {
                             }, {
                                 model: db.TaskRepair,
                                 include: [{
-                                    model: db.Operation
+                                    model: db.Operation,
+                                    include: [{
+                                        model: db.Categori
+                                    }]
                                 }]
                             }
                         ]
