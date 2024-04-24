@@ -101,6 +101,13 @@ io.on("connection", (socket) => {
     socket.on("orderStatusChange", async (data) => {
         io.emit("featchOrder")
     })
+    socket.on("newNotification", async () => {
+        console.log("New notification")
+        io.emit("fetchNotification")
+    })
+    socket.on("after_read_message", async () => {
+        io.emit("fetchNotificationAfterRead")
+    })
 });
 
 

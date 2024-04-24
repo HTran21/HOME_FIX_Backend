@@ -3,6 +3,7 @@ const { Op, where } = require('sequelize');
 // const { deleteOrder } = require('../controller/OrderController');
 const nodemailer = require("nodemailer");
 const moment = require('moment');
+const notificationService = require('./notificationService');
 
 class OrderService {
 
@@ -51,35 +52,37 @@ class OrderService {
                 });
                 const dateString = formattedDates.join(',');
 
+                let categori = await db.Categori.findByPk(idCategori);
+                let message = `Đơn sửa chữa ${categori.nameCategories} đã được tạo`;
+
+                let newOrderData = {
+                    ID_User: idUser,
+                    ID_Categori: idCategori,
+                    fullName: fullName,
+                    address: address,
+                    phone: phone,
+                    email: email,
+                    desProblem: desRepair,
+                    desireDate: dateString,
+                    status: status
+                };
+
                 if (idProduct) {
-                    let newOrder = await db.Order.create({
-                        ID_User: idUser,
-                        ID_Categori: idCategori,
-                        ID_Product: idProduct,
-                        fullName: fullName,
-                        address: address,
-                        phone: phone,
-                        email: email,
-                        desProblem: desRepair,
-                        desireDate: dateString,
-                        status: status
-                    })
-                    resolve({ success: true, message: "Đăng ký sửa chữa thành công" });
+                    newOrderData.ID_Product = idProduct;
                 }
-                else {
-                    let newOrder = await db.Order.create({
-                        ID_User: idUser,
-                        ID_Categori: idCategori,
-                        fullName: fullName,
-                        address: address,
-                        phone: phone,
-                        email: email,
-                        desProblem: desRepair,
-                        desireDate: dateString,
-                        status: status
-                    })
-                    resolve({ success: true, message: "Đăng ký sửa chữa thành công" });
-                }
+
+                let newOrder = await db.Order.create(newOrderData);
+
+
+                await db.Notification.create({
+                    receiveID: 0,
+                    contentNotification: message,
+                    typeNotification: "order_new",
+                    read: "UR",
+                    accountType: "AD"
+                });
+
+                resolve({ success: true, message: "Đăng ký sửa chữa thành công" });
             }
             catch (error) {
                 reject(error)
@@ -295,129 +298,31 @@ class OrderService {
         return new Promise(async (resolve, reject) => {
             try {
                 let detailOrder = await this.detailOrderService(ID_Repair);
+                let schedule = await db.Schedule.findByPk(idSchedule)
+                let ID_Repairer = schedule.ID_Repairer;
+                let message = `Bạn có đơn sửa chữa ${detailOrder.data.Categori.nameCategories} cần duyệt`;
 
-                // let updateOrder = await db.Order.update({
-                //     status: 'A',
-                // }, {
-                //     where: { id: ID_Repair }
-                // })
+                let updateStatus = await db.Order.update({
+                    status: 'P'
+                }, {
+                    where: {
+                        id: ID_Repair
+                    }
+                })
 
                 let newDetailOrder = await db.DetailOrder.create({
                     ID_Order: ID_Repair,
                     ID_Schedule: idSchedule,
                 })
-
-                // let repairer = await db.Schedule.findOne({
-                //     where: {
-                //         id: idSchedule
-                //     },
-                //     attributes: ['workDay'],
-                //     include: [{
-                //         model: db.Repairer,
-                //         attributes: ['usernameRepairer', 'emailRepairer', 'phoneRepairer']
-                //     }]
-                // })
-
-                // console.log("Tho", repairer.Repairer.usernameRepairer)
-
-                // const emailCustomer = detailOrder.data.email;
-                // const emailRepairer = repairer.Repairer.emailRepairer;
-
-                // let transporter = nodemailer.createTransport({
-                //     service: "gmail",
-                //     auth: {
-                //         user: "tranhoangtran22226@gmail.com",
-                //         pass: "fjwn cylp iemu hupx",
-                //     },
-                // });
-
-                // const htmlContent = `<section style="width: 100%; background-color: rgba(232, 232, 232, 0.8);">
-                //                     <div style="width: 500px; margin: auto; background-color: #fff; padding: 10px;">
-                //                         <div >
-                //                             <div style="text-align: center">
-                //                                <h1>ĐƠN SỬA CHỮA HOMEFIX</h1>
-                //                             </div>
-                //                             <div">
-                //                                 <h3>Thông tin khách hàng</h3>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${detailOrder.data.fullName}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Địa chỉ: </span>${detailOrder.data.address}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${detailOrder.data.phone}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${detailOrder.data.email}</p>
-                //                                 </div>
-                //                             </div>
-                //                             <hr />
-                //                             <div>
-                //                                 <h3>Dịch vụ mong muốn</h3>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Dịch vụ: </span>${detailOrder.data.Categori.Service.nameService}</p>
-                //                                 </div>
-                //                             </div>
-                //                             <hr />
-                //                             <div>
-                //                                 <h3>Thông tin thiết bị</h3>
-                //                                 <div class="row">
-                //                                     <div>
-                //                                         <p style="font-size: 14px;"><span style="font-weight: bold;">Nhãn hàng: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.Brand.nameBrand ? detailOrder.data.Product.Brand.nameBrand : ''}</p>
-                //                                     </div>
-                //                                     <div>
-                //                                         <p style="font-size: 14px;"><span style="font-weight: bold;">Loại thiết bị: </span>${detailOrder.data.Categori.nameCategories}</p>
-                //                                     </div>
-                //                                     <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Thiết bị: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.nameProduct ? detailOrder.data.Product.nameProduct : ''}</p>
-                //                                     </div>
-                //                                 </div>
-                //                             </div>
-                //                             <hr />
-                //                             <div class="row">
-                //                                 <h3>Thời gian sửa chữa</h3>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Ngày sửa chữa: </span>${moment(repairer.workDay).format('DD-MM-YYYY')}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                 <p style="font-size: 14px;"><span style="font-weight: bold;">Thời gian dự kiến: </span>${timeslot}</p>
-                //                             </div>
-                //                             </div>
-                //                             <hr />
-                //                             <div>
-                //                                 <h3>Thông tin thợ</h3>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${repairer.Repairer.usernameRepairer}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${repairer.Repairer.phoneRepairer}</p>
-                //                                 </div>
-                //                                 <div>
-                //                                     <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${repairer.Repairer.emailRepairer}</p>
-                //                                 </div>
-                //                             </div>
-                //                         </div>
-                //                     </div>
-                //     </section>
-
-                //         `
-
-                // await transporter.sendMail({
-                //     from: "tranhoangtran22226@gmail.com",
-                //     to: emailCustomer,
-                //     subject: "HOMEFIX - Thông Báo Xác Nhận Đơn Sửa Chữa",
-                //     html: htmlContent,
-                // });
-
-                // await transporter.sendMail({
-                //     from: "tranhoangtran22226@gmail.com",
-                //     to: emailRepairer,
-                //     subject: "HOMEFIX - Nhận Công Việc Sửa Chữa",
-                //     html: htmlContent,
-                // });
-
+                await db.Notification.create({
+                    receiveID: ID_Repairer,
+                    contentNotification: message,
+                    typeNotification: "order_approved_request",
+                    read: "UR",
+                    accountType: "RP"
+                });
                 resolve({ success: true, message: "Đã tạo lịch hẹn" })
+
             }
             catch (error) {
                 console.log("Lỗi", error);
@@ -472,6 +377,8 @@ class OrderService {
                                     attributes: ['usernameRepairer', 'emailRepairer', 'phoneRepairer']
                                 }]
                             })
+                            const message = `Đơn sửa chữa ${detailOrder.data.Categori.nameCategories} của bạn đã được duyệt`;
+                            const ID_User = detailOrder.data.ID_User;
 
                             let updateTimeSlot = await db.DetailOrder.update({
                                 timeRepair: timeSlotString
@@ -480,9 +387,6 @@ class OrderService {
                                     id: ID_DetailOrder
                                 }
                             })
-
-                            // console.log("Email Repairer", repairer.Repairer.emailRepairer)
-                            // console.log("Email user", detailOrder.data.fullName)
 
                             const emailCustomer = detailOrder.data.email;
                             const emailRepairer = repairer.Repairer.emailRepairer;
@@ -496,76 +400,76 @@ class OrderService {
                             });
 
                             const htmlContent = `<section style="width: 100%; background-color: rgba(232, 232, 232, 0.8);">
-                                        <div style="width: 500px; margin: auto; background-color: #fff; padding: 10px;">
-                                            <div >
-                                                <div style="text-align: center">
-                                                   <h1>ĐƠN SỬA CHỮA HOMEFIX</h1>
-                                                </div>
-                                                <div">
-                                                    <h3>Thông tin khách hàng</h3>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${detailOrder.data.fullName}</p>
+                                            <div style="width: 500px; margin: auto; background-color: #fff; padding: 10px;">
+                                                <div >
+                                                    <div style="text-align: center">
+                                                       <h1>ĐƠN SỬA CHỮA HOMEFIX</h1>
                                                     </div>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Địa chỉ: </span>${detailOrder.data.address}</p>
+                                                    <div">
+                                                        <h3>Thông tin khách hàng</h3>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${detailOrder.data.fullName}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Địa chỉ: </span>${detailOrder.data.address}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${detailOrder.data.phone}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${detailOrder.data.email}</p>
+                                                        </div>
                                                     </div>
+                                                    <hr />
                                                     <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${detailOrder.data.phone}</p>
+                                                        <h3>Dịch vụ mong muốn</h3>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Dịch vụ: </span>${detailOrder.data.Categori.Service.nameService}</p>
+                                                        </div>
                                                     </div>
+                                                    <hr />
                                                     <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${detailOrder.data.email}</p>
+                                                        <h3>Thông tin thiết bị</h3>
+                                                        <div class="row">
+                                                            <div>
+                                                                <p style="font-size: 14px;"><span style="font-weight: bold;">Nhãn hàng: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.Brand.nameBrand ? detailOrder.data.Product.Brand.nameBrand : ''}</p>
+                                                            </div>
+                                                            <div>
+                                                                <p style="font-size: 14px;"><span style="font-weight: bold;">Loại thiết bị: </span>${detailOrder.data.Categori.nameCategories}</p>
+                                                            </div>
+                                                            <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Thiết bị: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.nameProduct ? detailOrder.data.Product.nameProduct : ''}</p>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <hr />
-                                                <div>
-                                                    <h3>Dịch vụ mong muốn</h3>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Dịch vụ: </span>${detailOrder.data.Categori.Service.nameService}</p>
-                                                    </div>
-                                                </div>
-                                                <hr />
-                                                <div>
-                                                    <h3>Thông tin thiết bị</h3>
+                                                    <hr />
                                                     <div class="row">
+                                                        <h3>Thời gian sửa chữa</h3>
                                                         <div>
-                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Nhãn hàng: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.Brand.nameBrand ? detailOrder.data.Product.Brand.nameBrand : ''}</p>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Ngày sửa chữa: </span>${moment(repairer.workDay).format('DD-MM-YYYY')}</p>
                                                         </div>
                                                         <div>
-                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Loại thiết bị: </span>${detailOrder.data.Categori.nameCategories}</p>
+                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Thời gian dự kiến: </span>${timeStart}</p>
+                                                    </div>
+                                                    </div>
+                                                    <hr />
+                                                    <div>
+                                                        <h3>Thông tin thợ</h3>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${repairer.Repairer.usernameRepairer}</p>
                                                         </div>
                                                         <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Thiết bị: </span>${detailOrder.data.ID_Product && detailOrder.data.Product.nameProduct ? detailOrder.data.Product.nameProduct : ''}</p>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${repairer.Repairer.phoneRepairer}</p>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                                <hr />
-                                                <div class="row">
-                                                    <h3>Thời gian sửa chữa</h3>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Ngày sửa chữa: </span>${moment(repairer.workDay).format('DD-MM-YYYY')}</p>
-                                                    </div>
-                                                    <div>
-                                                    <p style="font-size: 14px;"><span style="font-weight: bold;">Thời gian dự kiến: </span>${timeStart}</p>
-                                                </div>
-                                                </div>
-                                                <hr />
-                                                <div>
-                                                    <h3>Thông tin thợ</h3>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Họ và tên: </span>${repairer.Repairer.usernameRepairer}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Số điện thoại: </span>${repairer.Repairer.phoneRepairer}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${repairer.Repairer.emailRepairer}</p>
+                                                        <div>
+                                                            <p style="font-size: 14px;"><span style="font-weight: bold;">Email: </span>${repairer.Repairer.emailRepairer}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                        </section>
+                            </section>
 
-                            `
+                                `
 
                             await transporter.sendMail({
                                 from: "tranhoangtran22226@gmail.com",
@@ -579,6 +483,14 @@ class OrderService {
                                 to: emailRepairer,
                                 subject: "HOMEFIX - Nhận Công Việc Sửa Chữa",
                                 html: htmlContent,
+                            });
+
+                            await db.Notification.create({
+                                receiveID: ID_User,
+                                contentNotification: message,
+                                typeNotification: "order_approved",
+                                read: "UR",
+                                accountType: "KH"
                             });
 
                             resolve({ success: true, message: "Đã tạo lịch hẹn" })
@@ -780,7 +692,6 @@ class OrderService {
     async listTaskOrderService(ID_DetailOrder, totalAmount, listTask) {
         return new Promise(async (resolve, reject) => {
             try {
-
                 for (const task of listTask) {
                     let createTaskReapir = await db.TaskRepair.create({
                         ID_DetailOrder: ID_DetailOrder,
@@ -798,11 +709,24 @@ class OrderService {
                 const detailOrder = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder } })
                 if (detailOrder) {
                     const order = await db.Order.findOne({
-                        where: { id: detailOrder.ID_Order }
+                        where: { id: detailOrder.ID_Order },
+                        include: [{
+                            model: db.Categori
+                        }]
                     });
                     if (order) {
+                        const ID_User = order.ID_User;
+                        const message = `Đơn sửa chữa ${order.Categori.nameCategories} của bạn đã hoàn thành`
                         await db.Order.update({ status: 'S' }, { where: { id: order.id } });
+                        await db.Notification.create({
+                            receiveID: ID_User,
+                            contentNotification: message,
+                            typeNotification: "order_completed",
+                            read: "UR",
+                            accountType: "KH"
+                        });
                         resolve({ success: true, message: "Đã tạo danh sách thao tác thành công" })
+
 
                     }
                     else {

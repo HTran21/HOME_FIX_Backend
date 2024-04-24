@@ -7,7 +7,16 @@ class UserService {
         return new Promise(async (resolve, reject) => {
             try {
 
-                let existDetailOrder = await db.DetailOrder.findOne({ where: { id: ID_DetailOrder }, raw: true });
+                let existDetailOrder = await db.DetailOrder.findOne({
+                    where: { id: ID_DetailOrder },
+                    include: [{
+                        model: db.Order,
+                        include: [{
+                            model: db.Categori
+                        }]
+                    }]
+                    // , raw: true
+                });
 
                 if (existDetailOrder) {
                     if (paymentMethod === 'cash') {
@@ -29,6 +38,15 @@ class UserService {
                                 id: ID_DetailOrder
                             }
                         })
+                        const ID_User = existDetailOrder.dataValues.Order.ID_User;
+                        const message = `Bạn có yêu cầu thanh toán đơn sửa chữa ${existDetailOrder.dataValues.Order.Categori.nameCategories}`;
+                        await db.Notification.create({
+                            receiveID: ID_User,
+                            contentNotification: message,
+                            typeNotification: "payment_request",
+                            read: "UR",
+                            accountType: "KH"
+                        });
                         resolve({ success: true, message: "Chọn phương thức thanh toán thành công" })
                     }
                     else {

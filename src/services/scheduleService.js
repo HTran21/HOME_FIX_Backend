@@ -204,6 +204,7 @@ class ScheduleService {
                         // attributes: ['workDay'],
                         include: {
                             model: db.DetailOrder,
+
                             include: {
                                 model: db.Order,
                                 include: {
@@ -217,22 +218,39 @@ class ScheduleService {
                     resolve(listWork)
                 }
                 else {
-                    let listWork = await db.Schedule.findOne({
-                        where: {
-                            ID_Repairer: id,
-                        },
-                        // attributes: ['workDay'],
-                        include: {
-                            model: db.DetailOrder,
-                            include: {
-                                model: db.Order,
-                                include: {
-                                    model: db.Categori,
-                                    attributes: ['nameCategories']
-                                }
+                    // let listWork = await db.Schedule.findAll({
+                    //     where: {
+                    //         ID_Repairer: id,
+                    //     },
+                    //     // attributes: ['workDay'],
+                    //     include: {
+                    //         model: db.DetailOrder,
+                    //         include: {
+                    //             model: db.Order,
+                    //             include: {
+                    //                 model: db.Categori,
+                    //                 attributes: ['nameCategories']
+                    //             }
+                    //         }
+
+                    //     }
+                    // })
+                    let listWork = await db.DetailOrder.findAll({
+                        include: [{
+                            model: db.Schedule,
+                            where: {
+                                ID_Repairer: id
                             }
 
-                        }
+                        }, {
+                            model: db.Order,
+                            where: {
+                                status: 'P'
+                            },
+                            include: [{
+                                model: db.Categori
+                            }]
+                        }]
                     })
                     resolve(listWork)
                 }
