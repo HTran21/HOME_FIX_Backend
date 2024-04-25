@@ -39,7 +39,7 @@ class UserService {
                             }
                         })
                         const ID_User = existDetailOrder.dataValues.Order.ID_User;
-                        const message = `Bạn có yêu cầu thanh toán đơn sửa chữa ${existDetailOrder.dataValues.Order.Categori.nameCategories}`;
+                        const message = `Bạn có yêu cầu thanh toán đơn sửa chữa ${existDetailOrder.dataValues.Order.Categori.nameCategories} ID ${existDetailOrder.dataValues.Order.id}`;
                         await db.Notification.create({
                             receiveID: ID_User,
                             contentNotification: message,

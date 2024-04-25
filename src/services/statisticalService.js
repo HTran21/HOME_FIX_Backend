@@ -375,6 +375,9 @@ class StatisticalService {
                             }
                         }, {
                             model: db.Order,
+                            where: {
+                                status: { [Op.notIn]: ['W', 'P', 'C'] }
+                            }
                         }]
                     })
 

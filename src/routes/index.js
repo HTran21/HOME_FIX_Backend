@@ -12,7 +12,8 @@ const payment = require("./payment");
 const message = require("./message");
 const statistical = require("./statistical");
 const comment = require("./comment");
-const notification = require("./notification")
+const notification = require("./notification");
+const feedback = require("./feedback")
 const authenMiddleware = require("../middleware/authMiddleware");
 const loginMiddleware = require("../middleware/loginMiddleware");
 
@@ -32,6 +33,7 @@ function route(app) {
     app.use("/statistical", loginMiddleware, statistical)
     app.use("/comment", comment)
     app.use("/notification", loginMiddleware, notification)
+    app.use("/feedback", loginMiddleware, feedback)
 }
 
 module.exports = route;

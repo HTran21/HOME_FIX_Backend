@@ -121,6 +121,21 @@ class OrderController {
         }
     }
 
+    async updateRepairerScheduleOrder(req, res, next) {
+        try {
+            const ID_Order = req.params.id;
+            const ID_Schedule = req.body.idSchedule
+            let data = await orderService.updateRepairerScheduleOrderService(ID_Order, ID_Schedule)
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e);
+            }
+        }
+    }
+
     async acceptOrderTimeSlot(req, res, next) {
         try {
             ;

@@ -115,11 +115,19 @@ class ScheduleService {
         return new Promise(async (resolve, reject) => {
             try {
                 let listWork = await db.Schedule.findAll({
-                    where: { ID_Repairer: id },
+                    where: {
+                        ID_Repairer: id,
+                    },
                     attributes: ['workDay'],
                     include: [
                         {
                             model: db.DetailOrder,
+                            include: [{
+                                model: db.Order,
+                                where: {
+                                    status: { [Op.notIn]: ['W', 'P', 'C'] }
+                                }
+                            }]
 
                         }
                     ]
@@ -215,7 +223,11 @@ class ScheduleService {
 
                         }
                     })
-                    resolve(listWork)
+                    if (listWork) {
+                        resolve({ success: true, message: "Danh sách sửa chữa", listWork })
+                    } else {
+                        resolve({ success: false, message: "Danh sách sửa chữa rỗng" })
+                    }
                 }
                 else {
                     // let listWork = await db.Schedule.findAll({

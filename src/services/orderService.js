@@ -150,7 +150,10 @@ class OrderService {
                                     }
                                 ]
                             }, {
-                                model: db.DetailOrder
+                                model: db.DetailOrder,
+                                include: [{
+                                    model: db.Schedule
+                                }]
                             }
                         ]
                     });
@@ -300,7 +303,7 @@ class OrderService {
                 let detailOrder = await this.detailOrderService(ID_Repair);
                 let schedule = await db.Schedule.findByPk(idSchedule)
                 let ID_Repairer = schedule.ID_Repairer;
-                let message = `Bạn có đơn sửa chữa ${detailOrder.data.Categori.nameCategories} cần duyệt`;
+                let message = `Bạn có đơn sửa chữa ${detailOrder.data.Categori.nameCategories} ID ${ID_Repair} cần duyệt`;
 
                 let updateStatus = await db.Order.update({
                     status: 'P'
@@ -322,6 +325,78 @@ class OrderService {
                     accountType: "RP"
                 });
                 resolve({ success: true, message: "Đã tạo lịch hẹn" })
+
+            }
+            catch (error) {
+                console.log("Lỗi", error);
+                reject(error)
+            }
+
+        })
+    }
+
+    async updateRepairerScheduleOrderService(ID_Order, ID_Schedule) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let existOrder = await db.Order.findByPk(ID_Order);
+                if (existOrder) {
+                    let exsitDetailOrder = await db.DetailOrder.findOne({
+                        where: {
+                            ID_Order: existOrder.id
+                        },
+                    })
+                    if (exsitDetailOrder) {
+                        let ID_DetailOrder = exsitDetailOrder.id;
+                        let repairer = await db.Repairer.findOne({
+                            include: [{
+                                model: db.Schedule,
+                                where: {
+                                    id: ID_Schedule
+                                }
+                            }]
+                        })
+                        let ID_Repairer = repairer.id;
+                        let role = repairer.role;
+                        let message = `Phản hồi về đơn sửa chữa ID ${ID_Order} đã được duyệt`
+                        let feedback = await db.FeedbackOrder.findOne({
+                            where: {
+                                ID_Order: ID_Order,
+                                accountType: role
+                            }
+                        })
+                        let IDFeedback = feedback.id;
+
+                        let updateScheduleOrder = await db.DetailOrder.update({
+                            ID_Schedule: ID_Schedule
+                        }, {
+                            where: {
+                                id: ID_DetailOrder
+                            }
+                        })
+
+                        let updateStatusFeedback = await db.FeedbackOrder.update({
+                            feedbackStatus: 'S'
+                        }, {
+                            where: {
+                                id: IDFeedback
+                            }
+                        })
+
+                        await db.Notification.create({
+                            receiveID: ID_Repairer,
+                            contentNotification: message,
+                            typeNotification: "order_feedback_success",
+                            read: "UR",
+                            accountType: role
+                        });
+                        resolve({ success: true, message: "Đã cập nhật lịch sửa chữa thành công" })
+
+                    } else {
+                        resolve({ success: false, message: "Không tìm thấy chi tiết sửa chữa" })
+                    }
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" })
+                }
 
             }
             catch (error) {
@@ -377,7 +452,7 @@ class OrderService {
                                     attributes: ['usernameRepairer', 'emailRepairer', 'phoneRepairer']
                                 }]
                             })
-                            const message = `Đơn sửa chữa ${detailOrder.data.Categori.nameCategories} của bạn đã được duyệt`;
+                            const message = `Đơn sửa chữa ${detailOrder.data.Categori.nameCategories} ID ${ID_Order} của bạn đã được duyệt`;
                             const ID_User = detailOrder.data.ID_User;
 
                             let updateTimeSlot = await db.DetailOrder.update({

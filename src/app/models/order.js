@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         sourceKey: "id",
         foreignKey: "ID_Order",
       });
+      Order.hasMany(models.FeedbackOrder, {
+        sourceKey: "id",
+        foreignKey: "ID_Order",
+      });
     }
   }
   Order.init({

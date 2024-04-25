@@ -57,8 +57,12 @@ class ScheduleController {
     async getDayWorkService(req, res, next) {
         try {
             const ID_Repair = req.params.id;
-            const selectDay = req.query.selectDay;
+            // const selectDay = req.query.selectDay;
+            const selectDay = (moment(req.query.selectDay).format('YYYY-MM-DD'))
+            // console.log(selectDay)
             const ID_Service = req.query.idService;
+            // console.log("selectDay", moment(selectDay).format('YYYY-MM-DD'))
+
             let data = await scheduleService.getDayWorkService(ID_Repair, selectDay, ID_Service);
             return res.json(data)
 
