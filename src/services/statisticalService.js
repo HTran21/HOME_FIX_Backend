@@ -129,11 +129,14 @@ class StatisticalService {
                     let listAmount = await db.DetailOrder.findAll({
                         where: {
                             paymentStatus: 'P'
-                        }
+                        },
+                        include: [{
+                            model: db.Schedule
+                        }]
                     });
                     let earningTotalMap = {};
                     listAmount.forEach(item => {
-                        const formattedDate = moment(item.updatedAt).format('YYYY-MM-DD');
+                        const formattedDate = moment(item.Schedule.workDay).format('YYYY-MM-DD');
 
                         if (!earningTotalMap[formattedDate]) {
                             earningTotalMap[formattedDate] = item.totalAmount;

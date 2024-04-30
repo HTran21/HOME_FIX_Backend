@@ -1,5 +1,5 @@
 const db = require('../app/models/index');
-const { Op, where } = require('sequelize');
+const { Op } = require('sequelize');
 // const { deleteOrder } = require('../controller/OrderController');
 const nodemailer = require("nodemailer");
 const moment = require('moment');
@@ -335,68 +335,127 @@ class OrderService {
         })
     }
 
-    async updateRepairerScheduleOrderService(ID_Order, ID_Schedule) {
+    async updateRepairerScheduleOrderService(ID_Order, ID_Schedule, ID_Feedback) {
         return new Promise(async (resolve, reject) => {
             try {
-                let existOrder = await db.Order.findByPk(ID_Order);
-                if (existOrder) {
-                    let exsitDetailOrder = await db.DetailOrder.findOne({
+
+                let feedback = await db.FeedbackOrder.findByPk(ID_Feedback)
+                if (feedback.feedbackStatus === 'W') {
+                    let existOrder = await db.Order.findOne({
                         where: {
-                            ID_Order: existOrder.id
+                            id: ID_Order
                         },
-                    })
-                    if (exsitDetailOrder) {
-                        let ID_DetailOrder = exsitDetailOrder.id;
-                        let repairer = await db.Repairer.findOne({
-                            include: [{
-                                model: db.Schedule,
-                                where: {
-                                    id: ID_Schedule
-                                }
-                            }]
-                        })
-                        let ID_Repairer = repairer.id;
-                        let role = repairer.role;
-                        let message = `Phản hồi về đơn sửa chữa ID ${ID_Order} đã được duyệt`
-                        let feedback = await db.FeedbackOrder.findOne({
-                            where: {
-                                ID_Order: ID_Order,
-                                accountType: role
-                            }
-                        })
-                        let IDFeedback = feedback.id;
-
-                        let updateScheduleOrder = await db.DetailOrder.update({
-                            ID_Schedule: ID_Schedule
-                        }, {
-                            where: {
-                                id: ID_DetailOrder
-                            }
-                        })
-
-                        let updateStatusFeedback = await db.FeedbackOrder.update({
-                            feedbackStatus: 'S'
-                        }, {
-                            where: {
-                                id: IDFeedback
-                            }
-                        })
-
-                        await db.Notification.create({
-                            receiveID: ID_Repairer,
-                            contentNotification: message,
-                            typeNotification: "order_feedback_success",
-                            read: "UR",
-                            accountType: role
-                        });
-                        resolve({ success: true, message: "Đã cập nhật lịch sửa chữa thành công" })
-
-                    } else {
-                        resolve({ success: false, message: "Không tìm thấy chi tiết sửa chữa" })
+                        include: [{
+                            model: db.Categori
+                        }]
                     }
-                } else {
-                    resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" })
+                    );
+                    if (existOrder) {
+                        let exsitDetailOrder = await db.DetailOrder.findOne({
+                            where: {
+                                ID_Order: existOrder.id
+                            },
+
+                        })
+                        if (exsitDetailOrder) {
+                            let ID_DetailOrder = exsitDetailOrder.id;
+                            let repairer = await db.Repairer.findOne({
+                                include: [{
+                                    model: db.Schedule,
+                                    where: {
+                                        id: ID_Schedule
+                                    }
+                                }]
+                            })
+                            let ID_Repairer = repairer.id;
+                            let IDFeedback = feedback.id;
+                            let message = `Phản hồi về đơn sửa chữa ID ${ID_Order} đã được duyệt`;
+                            if (feedback.accountType === 'RP') {
+
+                                await db.DetailOrder.update({
+                                    ID_Schedule: ID_Schedule
+                                }, {
+                                    where: {
+                                        id: ID_DetailOrder
+                                    }
+                                })
+
+                                await db.FeedbackOrder.update({
+                                    feedbackStatus: 'S'
+                                }, {
+                                    where: {
+                                        id: IDFeedback
+                                    }
+                                })
+
+                                await db.Notification.create({
+                                    receiveID: ID_Repairer,
+                                    contentNotification: message,
+                                    typeNotification: "order_feedback_success",
+                                    read: "UR",
+                                    accountType: 'RP'
+                                });
+                                resolve({ success: true, message: "Đã cập nhật lịch sửa chữa thành công" })
+                            } else if (feedback.accountType === 'KH') {
+                                let ID_User = existOrder.ID_User;
+                                let messageRepairer = `Bạn có đơn sửa chữa ${existOrder.Categori.nameCategories} ID ${ID_Order} cần duyệt`;
+
+                                await db.Order.update({
+                                    status: 'P'
+                                }, {
+                                    where: {
+                                        id: ID_Order
+                                    }
+                                })
+
+                                await db.DetailOrder.update({
+                                    ID_Schedule: ID_Schedule,
+                                    timeRepair: null
+                                }, {
+                                    where: {
+                                        id: ID_DetailOrder
+                                    }
+                                })
+
+                                await db.FeedbackOrder.update({
+                                    feedbackStatus: 'S'
+                                }, {
+                                    where: {
+                                        id: IDFeedback
+                                    }
+                                })
+                                await db.Notification.create({
+                                    receiveID: ID_User,
+                                    contentNotification: message,
+                                    typeNotification: "order_feedback_success",
+                                    read: "UR",
+                                    accountType: 'KH'
+                                });
+                                await db.Notification.create({
+                                    receiveID: ID_Repairer,
+                                    contentNotification: messageRepairer,
+                                    typeNotification: "order_approved_request",
+                                    read: "UR",
+                                    accountType: 'RP'
+                                });
+                            }
+                            resolve({ success: true, message: "Đã cập nhật lịch sửa chữa thành công" })
+
+                        } else {
+                            resolve({ success: false, message: "Không tìm thấy chi tiết sửa chữa" })
+                        }
+                    } else {
+                        resolve({ success: false, message: "Không tìm thấy đơn sửa chữa" })
+                    }
+
                 }
+                else if (feedback.feedbackStatus === 'S') {
+                    resolve({ success: false, message: "Phản hồi đã được duyệt" })
+                } else {
+                    resolve({ success: false, message: "Phản hồi đã bị từ chối" })
+                }
+
+
 
             }
             catch (error) {
@@ -406,6 +465,7 @@ class OrderService {
 
         })
     }
+
 
     async acceptOrderTimeSlotService(ID_Order, selectedTimeSlots) {
         {
@@ -605,6 +665,92 @@ class OrderService {
 
             })
         }
+    }
+
+    async cancelOrderService(ID_Feedback) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let currentDate = moment().format('YYYY-MM-DD');
+                let existFeedback = await db.FeedbackOrder.findByPk(ID_Feedback)
+                if (existFeedback) {
+                    console.log(currentDate)
+                    let ID_Order = existFeedback.ID_Order;
+                    let existDetailOrder = await db.DetailOrder.findOne({
+                        where: {
+                            ID_Order: ID_Order
+                        }, include: [{
+                            model: db.Schedule,
+                        }, {
+                            model: db.Order,
+                        }]
+                    });
+                    if (existDetailOrder) {
+                        let workDayOrder = moment(existDetailOrder.Schedule.workDay).format('YYYY-MM-DD')
+                        let daysDifference = moment(workDayOrder).diff(currentDate, 'days');
+                        console.log(daysDifference)
+                        if (daysDifference <= -1 || daysDifference >= 1) {
+                            console.log("So ngay truoc va sau khi sua chua", daysDifference)
+                            if (existFeedback.accountType === 'KH') {
+                                const ID_User = existDetailOrder.Order.ID_User;
+                                const message = `Đơn sửa chữa ID ${ID_Order} của bạn đã bị hủy`;
+                                await db.FeedbackOrder.update({
+                                    feedbackStatus: 'S'
+                                }, {
+                                    where: {
+                                        id: ID_Feedback
+                                    }
+                                })
+                                await db.Order.update({
+                                    status: 'C'
+                                }, {
+                                    where: {
+                                        id: ID_Order
+                                    }
+                                })
+                                await db.DetailOrder.update({
+                                    timeRepair: null
+                                }, {
+                                    where: {
+                                        ID_Order: ID_Order
+                                    }
+                                })
+                                await db.Notification.create({
+                                    receiveID: ID_User,
+                                    contentNotification: message,
+                                    typeNotification: "order_feedback_success",
+                                    read: "UR",
+                                    accountType: 'KH'
+                                });
+                                resolve({ success: true, message: "Đã hủy đơn sửa chữa thành công" })
+
+                            } else if (existFeedback.accountType === 'RP') {
+                                const ID_Repairer = existDetailOrder.Schedule.ID_Repairer;
+                                const message = `Đơn sửa chữa ID ${ID_Order} của bạn đã bị hủy`;
+                                // await db.Order.update({
+                                //     status: 'C'
+                                // }, {
+                                //     where: {
+                                //         id: ID_Order
+                                //     }
+                                // })
+                            }
+                        } else {
+                            console.log("Không thể hủy đơn do vi phạm chính sách")
+                            // resolve({ success: false, message: "Không thể hủy đơn do vi phạm chính sách" })
+                        }
+                    } else {
+                        resolve({ success: true, message: "Không tìm thấy đơn sửa chữa" })
+                    }
+                } else {
+                    resolve({ success: true, message: "Không tìm thấy đơn phản hồi" })
+                }
+
+            }
+            catch (error) {
+                console.log("Lỗi", error)
+                reject(error)
+            }
+        })
     }
 
     async fullDetailOrderService(ID_OrderDetail) {

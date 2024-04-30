@@ -282,7 +282,8 @@ class ScheduleService {
                 if (existSchedules) {
                     let totalOrderDay = await db.DetailOrder.count({
                         where: {
-                            ID_Schedule: ID_Schedule
+                            ID_Schedule: ID_Schedule,
+                            status: { [Op.notIn]: ['W', 'C'] }
                         }
                     })
                     resolve({ success: true, message: "Tông công việc một ngày của thợ", totalOrderDay })

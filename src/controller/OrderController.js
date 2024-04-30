@@ -120,12 +120,12 @@ class OrderController {
             }
         }
     }
-
     async updateRepairerScheduleOrder(req, res, next) {
         try {
             const ID_Order = req.params.id;
-            const ID_Schedule = req.body.idSchedule
-            let data = await orderService.updateRepairerScheduleOrderService(ID_Order, ID_Schedule)
+            const ID_Schedule = req.body.idSchedule;
+            const ID_Feedback = req.body.ID_Feedback;
+            let data = await orderService.updateRepairerScheduleOrderService(ID_Order, ID_Schedule, ID_Feedback)
             return res.json(data)
         }
         catch (e) {
@@ -135,6 +135,35 @@ class OrderController {
             }
         }
     }
+
+    async cancelOrder(req, res, next) {
+        try {
+            const ID_Feedback = req.params.id;
+            let data = await orderService.cancelOrderService(ID_Feedback);
+            return res.json(data)
+        }
+        catch (e) {
+            console.log(e);
+            if (e) {
+                return res.json(e);
+            }
+        }
+    }
+
+    // async updateScheduleOrder(req, res, next) {
+    //     try {
+    //         const ID_Order = req.params.id;
+    //         const ID_Schedule = req.body.idSchedule
+    //         let data = await orderService.updateScheduleOrserService(ID_Order, ID_Schedule)
+    //         return res.json(data)
+    //     }
+    //     catch (e) {
+    //         console.log(e);
+    //         if (e) {
+    //             return res.json(e);
+    //         }
+    //     }
+    // }
 
     async acceptOrderTimeSlot(req, res, next) {
         try {

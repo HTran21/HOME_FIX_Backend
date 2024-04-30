@@ -52,6 +52,20 @@ class FeedbackController {
         }
     }
 
+    async deniedFeedback(req, res, next) {
+        try {
+            const role = req.query.role;
+            const ID_Feedback = req.params.id;
+            let data = await feedbackService.deniedFeedbackService(ID_Feedback, role);
+            return res.json(data);
+        } catch (e) {
+            console.error(e);
+            if (e) {
+                return res.status(400).json({ error: e });
+            }
+        }
+    }
+
 }
 
 module.exports = new FeedbackController();
