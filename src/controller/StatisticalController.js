@@ -39,11 +39,34 @@ class StatisticalController {
             return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
         }
     }
+    async earningByCategori(req, res, next) {
+        try {
+            // console.log(req.query)
+            const data = await statisticalService.earningByCategoriService(req.query)
+            return res.json(data)
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
+        }
+    }
 
     async orderStatistical(req, res, next) {
         try {
             // console.log(req.query)
             const data = await statisticalService.orderStatisticalService(req.query)
+            return res.json(data)
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
+        }
+    }
+
+    async orderStatisticalByCategori(req, res, next) {
+        try {
+            // console.log(req.query)
+            const data = await statisticalService.orderStatisticalByCategoriService(req.query)
             return res.json(data)
         }
         catch (error) {
