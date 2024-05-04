@@ -12,6 +12,7 @@ router.get("/order", statisticalController.orderStatistical)
 router.get("/orderbyCategori", statisticalController.orderStatisticalByCategori)
 router.get("/overviewJob", statisticalController.overviewJob)
 router.get("/repairer", statisticalController.jobStatistical)
+router.get("/repairerStatistic", statisticalController.repairerStatistic)
 // router.put("/update/:id", loginMiddleware, userController.updateProfile)
 
 module.exports = router;

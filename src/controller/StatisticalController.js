@@ -75,6 +75,18 @@ class StatisticalController {
         }
     }
 
+    async repairerStatistic(req, res, next) {
+        try {
+            const data = await statisticalService.repairerStatisticService(req.query)
+            return res.json(data)
+
+        }
+        catch (error) {
+            console.log(error);
+            return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
+        }
+    }
+
     async overviewJob(req, res, next) {
         try {
             const data = await statisticalService.overviewJobService(req.query)
@@ -96,6 +108,8 @@ class StatisticalController {
             return res.status(500).json({ success: false, message: "Đã xảy ra lỗi" });
         }
     }
+
+
 
 }
 

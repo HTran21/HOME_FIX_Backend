@@ -933,6 +933,210 @@ class StatisticalService {
         })
     }
 
+    async repairerStatisticService(data) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let listRepairer = await db.Repairer.findAll({
+                    where: {
+                        status: { [Op.ne]: 'D' }
+                    }
+                });
+
+                if (data.dateSend) {
+                    if (data.dateSend.type === 'datepicker') {
+                        const startDate = moment(data.dateSend.data[0]);
+                        const endDate = moment(data.dateSend.data[1]);
+
+                        let listOrderByRepairer = await db.DetailOrder.findAll({
+                            include: [{
+                                model: db.Order,
+                                where: {
+                                    status: {
+                                        [Op.notIn]: ['W', 'P']
+                                    }
+                                },
+                                include: [{
+                                    model: db.Categori
+                                }]
+                            }, {
+                                model: db.Schedule,
+                                where: {
+                                    workDay: {
+                                        [Op.between]: [startDate, endDate]
+                                    }
+                                }
+                            }]
+                        })
+
+                        let totalOrderByRepaier = listRepairer.map(item => {
+                            let idRepairer = item.id;
+                            let orderByRepaierSuccess = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'S');
+                            let orderByRepaierFail = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'C');
+
+                            return {
+                                repairer: item,
+                                ordersSuccess: orderByRepaierSuccess,
+                                ordersFail: orderByRepaierFail,
+                            };
+                        });
+
+
+                        let totalOrderSuccess = totalOrderByRepaier.reduce((total, order) => total + order.ordersSuccess.length, 0)
+                        let totalOrderFail = totalOrderByRepaier.reduce((total, order) => total + order.ordersFail.length, 0)
+
+
+                        resolve({ success: true, message: "Thống kê đơn sửa chữa theo ngày của thợ", totalOrderByRepaier, totalOrderSuccess, totalOrderFail });
+                    }
+                    if (data.dateSend.type === 'month') {
+                        const month = moment(data.dateSend.data, "YYYY-MM");
+                        const daysInMonth = month.daysInMonth();
+                        const firstDayOfMonth = month.startOf('month');
+
+                        const endDayOfMonth = month.clone().endOf('month')
+
+                        let listOrderByRepairer = await db.DetailOrder.findAll({
+                            include: [{
+                                model: db.Order,
+                                where: {
+                                    status: {
+                                        [Op.notIn]: ['W', 'P']
+                                    }
+                                },
+                                include: [{
+                                    model: db.Categori
+                                }]
+                            }, {
+                                model: db.Schedule,
+                                where: {
+                                    workDay: {
+                                        [Op.between]: [firstDayOfMonth, endDayOfMonth]
+                                    }
+                                }
+                            }]
+                        })
+
+                        let totalOrderByRepaier = listRepairer.map(item => {
+                            let idRepairer = item.id;
+                            let orderByRepaierSuccess = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'S');
+                            let orderByRepaierFail = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'C');
+
+                            return {
+                                repairer: item,
+                                ordersSuccess: orderByRepaierSuccess,
+                                ordersFail: orderByRepaierFail,
+                            };
+                        });
+
+
+                        let totalOrderSuccess = totalOrderByRepaier.reduce((total, order) => total + order.ordersSuccess.length, 0)
+                        let totalOrderFail = totalOrderByRepaier.reduce((total, order) => total + order.ordersFail.length, 0)
+
+
+                        resolve({ success: true, message: "Thống kê đơn sửa chữa theo ngày của thợ", totalOrderByRepaier, totalOrderSuccess, totalOrderFail });
+                    }
+                    if (data.dateSend.type === 'year') {
+                        const year = parseInt(data.dateSend.data);
+                        const startOfYear = moment(year, "YYYY").startOf('year');
+                        const endOfYear = moment(year, "YYYY").endOf('year');
+
+                        let listOrderByRepairer = await db.DetailOrder.findAll({
+                            include: [{
+                                model: db.Order,
+                                where: {
+                                    status: {
+                                        [Op.notIn]: ['W', 'P']
+                                    }
+                                },
+                                include: [{
+                                    model: db.Categori
+                                }]
+                            }, {
+                                model: db.Schedule,
+                                where: {
+                                    workDay: {
+                                        [Op.between]: [startOfYear, endOfYear]
+                                    }
+                                }
+                            }]
+                        })
+
+                        let totalOrderByRepaier = listRepairer.map(item => {
+                            let idRepairer = item.id;
+                            let orderByRepaierSuccess = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'S');
+                            let orderByRepaierFail = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'C');
+
+                            return {
+                                repairer: item,
+                                ordersSuccess: orderByRepaierSuccess,
+                                ordersFail: orderByRepaierFail,
+                            };
+                        });
+
+
+                        let totalOrderSuccess = totalOrderByRepaier.reduce((total, order) => total + order.ordersSuccess.length, 0)
+                        let totalOrderFail = totalOrderByRepaier.reduce((total, order) => total + order.ordersFail.length, 0)
+
+
+                        resolve({ success: true, message: "Thống kê đơn sửa chữa theo ngày của thợ", totalOrderByRepaier, totalOrderSuccess, totalOrderFail });
+                    }
+
+                    else {
+                        resolve({ success: false, message: "Vui lòng chọn thời gian" });
+                    }
+
+                } else {
+                    const today = moment();
+                    const startDate = today.clone().startOf('week');
+                    const endDate = today.clone().endOf('week');
+                    let listOrderByRepairer = await db.DetailOrder.findAll({
+                        include: [{
+                            model: db.Order,
+                            where: {
+                                status: {
+                                    [Op.notIn]: ['W', 'P']
+                                }
+                            },
+                            include: [{
+                                model: db.Categori
+                            }]
+                        }, {
+                            model: db.Schedule,
+                            where: {
+                                workDay: {
+                                    [Op.between]: [startDate, endDate]
+                                }
+                            }
+                        }]
+                    })
+
+                    let totalOrderByRepaier = listRepairer.map(item => {
+                        let idRepairer = item.id;
+                        let orderByRepaierSuccess = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'S');
+                        let orderByRepaierFail = listOrderByRepairer.filter(order => order.Schedule.ID_Repairer === idRepairer && order.Order.status === 'C');
+
+                        return {
+                            repairer: item,
+                            ordersSuccess: orderByRepaierSuccess,
+                            ordersFail: orderByRepaierFail,
+                        };
+                    });
+
+
+                    let totalOrderSuccess = totalOrderByRepaier.reduce((total, order) => total + order.ordersSuccess.length, 0)
+                    let totalOrderFail = totalOrderByRepaier.reduce((total, order) => total + order.ordersFail.length, 0)
+
+                    resolve({ success: true, message: "Thống kê đơn sửa chữa theo thợ", totalOrderByRepaier, totalOrderSuccess, totalOrderFail });
+                }
+
+
+            }
+            catch (error) {
+                console.log("Error", error)
+                reject(error);
+            }
+        })
+    }
+
     async overviewJobService(data) {
         return new Promise(async (resolve, reject) => {
             try {
