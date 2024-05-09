@@ -110,6 +110,19 @@ class ScheduleController {
         }
     }
 
+    async deleteSchedule(req, res, next) {
+        try {
+            const ID_Repairer = req.query.id;
+            const dateDelete = req.query.date;
+            let data = await scheduleService.deleteScheduleService(ID_Repairer, dateDelete);
+            return res.json(data);
+        }
+        catch (e) {
+            console.log(e);
+            return res.json(e)
+        }
+    }
+
 
 }
 

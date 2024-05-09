@@ -42,85 +42,6 @@ class StatisticalService {
         })
     }
 
-    // async earningStatisticalService(data) {
-    //     return new Promise(async (resolve, reject) => {
-    //         try {
-
-    //             if (data.date) {
-    //                 const startDate = moment(data.date[0]);
-    //                 const endDate = moment(data.date[1]);
-    //                 let listAmount = await db.DetailOrder.findAll({
-    //                     where: {
-    //                         updatedAt: {
-    //                             [Op.between]: [startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD')]
-    //                         }
-    //                     }
-    //                 });
-
-    //                 let earningTotalMap = {};
-
-    //                 listAmount.forEach(item => {
-    //                     const formattedDate = moment(item.updatedAt).format('YYYY-MM-DD');
-
-    //                     if (!earningTotalMap[formattedDate]) {
-    //                         earningTotalMap[formattedDate] = item.totalAmount;
-    //                     } else {
-    //                         earningTotalMap[formattedDate] += item.totalAmount;
-    //                     }
-    //                 });
-
-    //                 let earningTotal = [];
-
-    //                 for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
-    //                     const formattedDate = date.format('YYYY-MM-DD');
-    //                     if (earningTotalMap[formattedDate]) {
-    //                         earningTotal.push({ updatedAt: formattedDate, totalAmount: earningTotalMap[formattedDate] });
-    //                     } else {
-    //                         earningTotal.push({ updatedAt: formattedDate, totalAmount: 0 });
-    //                     }
-    //                 }
-
-    //                 resolve({ success: true, message: "Thống kê toàn bộ doanh thu", earningTotal });
-    //             } else {
-    //                 let listAmount = await db.DetailOrder.findAll({
-    //                     where: {
-    //                         paymentStatus: 'P'
-    //                     }
-    //                 });
-
-    //                 const today = moment();
-    //                 const startDate = today.clone().startOf('week');
-    //                 const endDate = today.clone().endOf('week');
-    //                 let earningTotalMap = {};
-    //                 listAmount.forEach(item => {
-    //                     const formattedDate = moment(item.updatedAt).format('YYYY-MM-DD');
-    //                     if (!earningTotalMap[formattedDate]) {
-    //                         earningTotalMap[formattedDate] = item.totalAmount;
-    //                     } else {
-    //                         earningTotalMap[formattedDate] += item.totalAmount;
-    //                     }
-    //                 });
-
-    //                 let earningTotal = [];
-    //                 for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
-    //                     const formattedDate = date.format('YYYY-MM-DD');
-    //                     if (earningTotalMap[formattedDate]) {
-    //                         earningTotal.push({ updatedAt: formattedDate, totalAmount: earningTotalMap[formattedDate] });
-    //                     } else {
-    //                         earningTotal.push({ updatedAt: formattedDate, totalAmount: 0 });
-    //                     }
-    //                 }
-
-    //                 resolve({ success: true, message: "Thống kê toàn bộ doanh thu", earningTotal });
-    //             }
-
-    //         }
-    //         catch (error) {
-    //             console.log("Error", error)
-    //             reject(error);
-    //         }
-    //     })
-    // }
 
     async earningStatisticalSelectService(data) {
         return new Promise(async (resolve, reject) => {
@@ -305,9 +226,13 @@ class StatisticalService {
                     }
                 }
                 else {
+                    // const today = moment();
+                    // const startDate = today.clone().startOf('week');
+                    // const endDate = today.clone().endOf('week');
                     const today = moment();
-                    const startDate = today.clone().startOf('week');
-                    const endDate = today.clone().endOf('week');
+                    const startDate = today.clone().subtract(6, 'days').startOf('day');
+                    const endDate = today.clone().endOf('day');
+
                     let earningTotal = [];
 
                     for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
@@ -366,10 +291,10 @@ class StatisticalService {
     async earningByCategoriService(data) {
         return new Promise(async (resolve, reject) => {
             try {
-                if (data.dateSend) {
-                    if (data.dateSend.type === 'datepicker') {
-                        const startDate = moment(data.dateSend.data[0]);
-                        const endDate = moment(data.dateSend.data[1]);
+                if (data.dateSendCategori) {
+                    if (data.dateSendCategori.typeCategori === 'datepicker') {
+                        const startDate = moment(data.dateSendCategori.data[0]);
+                        const endDate = moment(data.dateSendCategori.data[1]);
                         let listAmount = await db.DetailOrder.findAll({
                             where: {
                                 paymentStatus: 'P'
@@ -402,8 +327,8 @@ class StatisticalService {
 
                         resolve({ success: true, message: "Thống kê doanh thu theo ngày loại thiết bị", listOrderByCategori, totalAmount });
                     }
-                    if (data.dateSend.type === 'month') {
-                        const month = moment(data.dateSend.data, "YYYY-MM");
+                    if (data.dateSendCategori.typeCategori === 'month') {
+                        const month = moment(data.dateSendCategori.data, "YYYY-MM");
                         // const daysInMonth = month.daysInMonth();
                         const firstDayOfMonth = month.startOf('month');
                         const endDayOfMonth = month.clone().endOf('month')
@@ -438,8 +363,8 @@ class StatisticalService {
                         let totalAmount = listOrderByCategori.reduce((total, amount) => total + amount.totalAmount, 0)
                         resolve({ success: true, message: "Thống kê doanh thu theo tháng loại thiết bị", listOrderByCategori, totalAmount });
                     }
-                    if (data.dateSend.type === 'year') {
-                        const year = parseInt(data.dateSend.data);
+                    if (data.dateSendCategori.typeCategori === 'year') {
+                        const year = parseInt(data.dateSendCategori.data);
                         const startOfYear = moment(year, "YYYY").startOf('year');
                         const endOfYear = moment(year, "YYYY").endOf('year');
 
@@ -706,9 +631,12 @@ class StatisticalService {
                     }
 
                 } else {
+                    // const today = moment();
+                    // const startDate = today.clone().startOf('week');
+                    // const endDate = today.clone().endOf('week');
                     const today = moment();
-                    const startDate = today.clone().startOf('week');
-                    const endDate = today.clone().endOf('week');
+                    const startDate = today.clone().subtract(6, 'days').startOf('day');
+                    const endDate = today.clone().endOf('day');
                     let orderTotal = [];
 
                     for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
@@ -767,10 +695,10 @@ class StatisticalService {
             try {
                 let listCategori = await db.Categori.findAll();
 
-                if (data.dateSend) {
-                    if (data.dateSend.type === 'datepicker') {
-                        const startDate = moment(data.dateSend.data[0]);
-                        const endDate = moment(data.dateSend.data[1]);
+                if (data.dateSendCategori) {
+                    if (data.dateSendCategori.typeCategori === 'datepicker') {
+                        const startDate = moment(data.dateSendCategori.data[0]);
+                        const endDate = moment(data.dateSendCategori.data[1]);
 
 
                         let listOrderByCategoriDay = await db.DetailOrder.findAll({
@@ -806,8 +734,8 @@ class StatisticalService {
 
                         resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", totalOrderByCategori });
                     }
-                    if (data.dateSend.type === 'month') {
-                        const month = moment(data.dateSend.data, "YYYY-MM");
+                    if (data.dateSendCategori.typeCategori === 'month') {
+                        const month = moment(data.dateSendCategori.data, "YYYY-MM");
                         const daysInMonth = month.daysInMonth();
                         const firstDayOfMonth = month.startOf('month');
 
@@ -845,8 +773,8 @@ class StatisticalService {
                         });
                         resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa theo tháng", totalOrderByCategori });
                     }
-                    if (data.dateSend.type === 'year') {
-                        const year = parseInt(data.dateSend.data);
+                    if (data.dateSendCategori.typeCategori === 'year') {
+                        const year = parseInt(data.dateSendCategori.data);
                         const startOfYear = moment(year, "YYYY").startOf('year');
                         const endOfYear = moment(year, "YYYY").endOf('year');
 
@@ -888,9 +816,12 @@ class StatisticalService {
                     }
 
                 } else {
+                    // const today = moment();
+                    // const startDate = today.clone().startOf('week');
+                    // const endDate = today.clone().endOf('week');
                     const today = moment();
-                    const startDate = today.clone().startOf('week');
-                    const endDate = today.clone().endOf('week');
+                    const startDate = today.clone().subtract(6, 'days').startOf('day');
+                    const endDate = today.clone().endOf('day');
                     let listOrderByCategoriDay = await db.DetailOrder.findAll({
                         include: [{
                             model: db.Order,
@@ -1085,9 +1016,12 @@ class StatisticalService {
                     }
 
                 } else {
+                    // const today = moment();
+                    // const startDate = today.clone().startOf('week');
+                    // const endDate = today.clone().endOf('week');
                     const today = moment();
-                    const startDate = today.clone().startOf('week');
-                    const endDate = today.clone().endOf('week');
+                    const startDate = today.clone().subtract(6, 'days').startOf('day');
+                    const endDate = today.clone().endOf('day');
                     let listOrderByRepairer = await db.DetailOrder.findAll({
                         include: [{
                             model: db.Order,
@@ -1191,81 +1125,94 @@ class StatisticalService {
                         }, {
                             model: db.Order,
                             where: {
-                                status: { [Op.notIn]: ['W', 'P', 'C'] }
+                                status: { [Op.notIn]: ['W', 'P'] }
                             }
                         }]
                     })
 
 
-                    let jobTotalMap = {};
-                    listJob.forEach(item => {
-                        const formattedDate = moment(item.Schedule.workDay).format('YYYY-MM-DD');
-                        // console.log("Ngay", formattedDate)
-                        if (!jobTotalMap[formattedDate]) {
-                            jobTotalMap[formattedDate] = {
-                                count: 1
-                            }
-                        } else {
-                            jobTotalMap[formattedDate].count++
-                        }
-                    });
+                    // let jobTotalMap = {};
+                    // listJob.forEach(item => {
+                    //     const formattedDate = moment(item.Schedule.workDay).format('YYYY-MM-DD');
+                    //     if (!jobTotalMap[formattedDate]) {
+                    //         jobTotalMap[formattedDate] = {
+                    //             count: 1
+                    //         }
+                    //     } else {
+                    //         jobTotalMap[formattedDate].count++
+                    //     }
+                    // });
 
                     if (data.dateSend) {
                         if (data.dateSend.type === 'datepicker') {
                             const startDate = moment(data.dateSend.data[0]);
                             const endDate = moment(data.dateSend.data[1]);
-
                             let jobTotal = [];
 
                             for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
                                 const formattedDate = date.format('YYYY-MM-DD');
-                                if (jobTotalMap[formattedDate]) {
-                                    jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
-                                } else {
-                                    jobTotal.push({ workDay: formattedDate, count: 0 });
-                                }
-                            }
+                                const jobsOnDate = listJob.filter(item => moment(item.Schedule.workDay).format('YYYY-MM-DD') === formattedDate);
 
-                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal });
+                                const successfulJobs = jobsOnDate.filter(job => job.Order.status === 'S').length;
+                                const failedJobs = jobsOnDate.filter(job => job.Order.status === 'C').length;
+
+                                jobTotal.push({ workDay: formattedDate, successfulJobs, failedJobs });
+                            }
+                            let totalOrderSuccess = jobTotal.reduce((total, item) => total + item.successfulJobs, 0)
+                            let totalOrderFail = jobTotal.reduce((total, item) => total + item.failedJobs, 0)
+
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal, totalOrderSuccess, totalOrderFail });
                         }
                         if (data.dateSend.type === 'month') {
                             const month = moment(data.dateSend.data, "YYYY-MM");
                             const daysInMonth = month.daysInMonth();
                             const firstDayOfMonth = month.startOf('month');
                             let jobTotal = [];
+                            // for (let i = 0; i < daysInMonth; i++) {
+                            //     const currentDay = firstDayOfMonth.clone().add(i, 'days');
+                            //     const formattedDate = currentDay.format('YYYY-MM-DD');
+                            //     if (jobTotalMap[formattedDate]) {
+                            //         jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
+                            //     } else {
+                            //         jobTotal.push({ workDay: formattedDate, count: 0 });
+                            //     }
+                            // }
                             for (let i = 0; i < daysInMonth; i++) {
                                 const currentDay = firstDayOfMonth.clone().add(i, 'days');
                                 const formattedDate = currentDay.format('YYYY-MM-DD');
-                                if (jobTotalMap[formattedDate]) {
-                                    jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
-                                } else {
-                                    jobTotal.push({ workDay: formattedDate, count: 0 });
-                                }
+                                const jobsOnDate = listJob.filter(item => moment(item.Schedule.workDay).format('YYYY-MM-DD') === formattedDate);
+                                const successfulJobs = jobsOnDate.filter(job => job.Order.status === 'S').length;
+                                const failedJobs = jobsOnDate.filter(job => job.Order.status === 'C').length;
+
+                                jobTotal.push({ workDay: formattedDate, successfulJobs, failedJobs });
                             }
-                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa theo tháng", jobTotal });
+
+                            let totalOrderSuccess = jobTotal.reduce((total, item) => total + item.successfulJobs, 0)
+                            let totalOrderFail = jobTotal.reduce((total, item) => total + item.failedJobs, 0)
+
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa theo tháng", jobTotal, totalOrderSuccess, totalOrderFail });
 
 
                         }
                         if (data.dateSend.type === 'year') {
-                            const year = parseInt(data.dateSend.data);
-                            const monthsOfYear = [];
                             let jobTotal = [];
+                            const year = parseInt(data.dateSend.data);
+                            const startOfYear = moment(year, "YYYY").startOf('year');
+                            const endOfYear = moment(year, "YYYY").endOf('year');
 
-                            for (let month = 0; month < 12; month++) {
-                                const formattedMonth = moment().year(year).month(month).startOf('month').format('YYYY-MM');
-                                monthsOfYear.push(formattedMonth);
-                                jobTotal.push({ workDay: formattedMonth, count: 0 });
+                            for (let date = moment(startOfYear); date <= endOfYear; date = date.clone().add(1, 'month')) {
+                                const formattedDate = date.format('YYYY-MM');
+                                const jobsOnDate = listJob.filter(item => moment(item.Schedule.workDay).format('YYYY-MM') === formattedDate);
+
+                                const successfulJobs = jobsOnDate.filter(job => job.Order.status === 'S').length;
+                                const failedJobs = jobsOnDate.filter(job => job.Order.status === 'C').length;
+
+                                jobTotal.push({ workDay: formattedDate, successfulJobs, failedJobs });
                             }
+                            let totalOrderSuccess = jobTotal.reduce((total, item) => total + item.successfulJobs, 0)
+                            let totalOrderFail = jobTotal.reduce((total, item) => total + item.failedJobs, 0)
 
-                            for (const date in jobTotalMap) {
-                                const monthOfYear = moment(date).format('YYYY-MM');
-                                const index = monthsOfYear.indexOf(monthOfYear);
-                                if (index !== -1) {
-                                    jobTotal[index].count += jobTotalMap[date].count;
-                                }
-                            }
-
-                            resolve({ success: true, message: "Thống kê toàn bộ đơn sủa chữa theo năm", jobTotal });
+                            resolve({ success: true, message: "Thống kê toàn bộ đơn sủa chữa theo năm", jobTotal, totalOrderSuccess, totalOrderFail });
                         }
 
                         else {
@@ -1274,22 +1221,27 @@ class StatisticalService {
 
                     }
                     else {
+                        // const today = moment();
+                        // const startDate = today.clone().startOf('week');
+                        // const endDate = today.clone().endOf('week');
                         const today = moment();
-                        const startDate = today.clone().startOf('week');
-                        const endDate = today.clone().endOf('week');
+                        const startDate = today.clone().subtract(6, 'days').startOf('day');
+                        const endDate = today.clone().endOf('day');
 
                         let jobTotal = [];
-
                         for (let date = moment(startDate); date <= endDate; date = date.clone().add(1, 'day')) {
                             const formattedDate = date.format('YYYY-MM-DD');
-                            if (jobTotalMap[formattedDate]) {
-                                jobTotal.push({ workDay: formattedDate, count: jobTotalMap[formattedDate].count });
-                            } else {
-                                jobTotal.push({ workDay: formattedDate, count: 0 });
-                            }
+                            const jobsOnDate = listJob.filter(item => moment(item.Schedule.workDay).format('YYYY-MM-DD') === formattedDate);
+
+                            const successfulJobs = jobsOnDate.filter(job => job.Order.status === 'S').length;
+                            const failedJobs = jobsOnDate.filter(job => job.Order.status === 'C').length;
+
+                            jobTotal.push({ workDay: formattedDate, successfulJobs, failedJobs });
                         }
 
-                        resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal });
+                        let totalOrderSuccess = jobTotal.reduce((total, item) => total + item.successfulJobs, 0)
+                        let totalOrderFail = jobTotal.reduce((total, item) => total + item.failedJobs, 0)
+                        resolve({ success: true, message: "Thống kê toàn bộ đơn sửa chữa", jobTotal, totalOrderSuccess, totalOrderFail });
                     }
 
 
@@ -1305,6 +1257,8 @@ class StatisticalService {
             }
         })
     }
+
+
 
 }
 

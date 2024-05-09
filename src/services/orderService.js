@@ -177,6 +177,12 @@ class OrderService {
                                         attributes: ['nameService']
                                     }]
                                 },
+                                {
+                                    model: db.DetailOrder,
+                                    include: [{
+                                        model: db.Schedule
+                                    }]
+                                }
                             ]
                         })
                         // console.log("Co ID product", order)
@@ -490,6 +496,7 @@ class OrderService {
                     if (detailOrder) {
 
                         let ID_DetailOrder = detailOrder.data.DetailOrder.id;
+
                         let updateOrder = await db.Order.update({
                             status: 'A',
                         }, {

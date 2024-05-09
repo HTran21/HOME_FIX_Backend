@@ -11,4 +11,5 @@ router.get("/dayWorkService/:id", authenMiddleware, scheduleController.getDayWor
 router.get("/timeslot/:id", scheduleController.getTimeSlot)
 router.get("/workRepair/:id", repairerMiddleware, scheduleController.getWorkRepairer)
 router.get("/totalOrderDay/:id", repairerMiddleware, scheduleController.getTotalOrderDay)
+router.delete("/deleteSchedule", repairerMiddleware, scheduleController.deleteSchedule)
 module.exports = router;

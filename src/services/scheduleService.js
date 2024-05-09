@@ -126,7 +126,13 @@ class ScheduleService {
                                 model: db.Order,
                                 where: {
                                     status: { [Op.notIn]: ['W', 'P', 'C'] }
+                                },
+                                include: {
+                                    model: db.Categori,
+                                    attributes: ['nameCategories']
                                 }
+                            }, {
+                                model: db.Schedule
                             }]
 
                         }
@@ -283,12 +289,17 @@ class ScheduleService {
                     let totalOrderDay = await db.DetailOrder.count({
                         where: {
                             ID_Schedule: ID_Schedule,
-                            status: { [Op.notIn]: ['W', 'C'] }
-                        }
+                        },
+                        include: [{
+                            model: db.Order,
+                            where: {
+                                status: { [Op.notIn]: ['W', 'C'] }
+                            }
+                        }]
                     })
                     resolve({ success: true, message: "Tông công việc một ngày của thợ", totalOrderDay })
                 } else {
-                    resolve({ success: true, message: "Không tìm thấy lịch làm việc" })
+                    resolve({ success: false, message: "Không tìm thấy lịch làm việc" })
                 }
             }
             catch (error) {
@@ -298,6 +309,34 @@ class ScheduleService {
         })
     }
 
+    async deleteScheduleService(ID_Repairer, dateDelete) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                let dateFormat = new Date(dateDelete);
+                let existSchedule = await db.Schedule.findOne({
+                    where: {
+                        ID_Repairer: ID_Repairer,
+                        workDay: dateFormat
+                    }
+                })
+                if (existSchedule) {
+                    let ID_Schedule = existSchedule.id;
+                    await db.Schedule.destroy({
+                        where: {
+                            id: ID_Schedule
+                        }
+                    })
+                    resolve({ success: true, message: "Đã xóa lịch làm việc thành công" })
+                } else {
+                    resolve({ success: false, message: "Không tìm thấy lịch làm việc" })
+                }
+            }
+            catch (error) {
+                reject(error);
+            }
+
+        })
+    }
 
 
 

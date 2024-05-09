@@ -109,8 +109,6 @@ class StatisticalController {
         }
     }
 
-
-
 }
 
 module.exports = new StatisticalController();
