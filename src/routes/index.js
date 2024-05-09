@@ -30,7 +30,7 @@ function route(app) {
     app.use("/order", loginMiddleware, order)
     app.use("/payment", payment)
     app.use("/message", loginMiddleware, message)
-    app.use("/statistical", loginMiddleware, statistical)
+    app.use("/statistical", statistical)
     app.use("/comment", comment)
     app.use("/notification", loginMiddleware, notification)
     app.use("/feedback", loginMiddleware, feedback)
